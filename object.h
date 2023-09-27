@@ -4,16 +4,16 @@
 #include<raylib.h>
 #include<raymath.h>
 
-typedef struct Object {
+typedef struct AlObject {
     Transform transform;
     bool hasTransformChanged;
     Model model;
-} Object;
+} AlObject;
 
-void alObjectRecalculate(Object *self);
+void alObjectRecalculate(AlObject *self);
 
 // If the transform is changed, we should recalculate transform (Transform) -> model.transform (matrix)
 // should be called before rendering/after update
-void alObjectTryRecalculate(Object *self);
+void alObjectTryRecalculate(AlObject *self);
 
 #endif //HELLO_C_OBJECT_H

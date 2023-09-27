@@ -5,11 +5,11 @@
 #include "raymath.h"
 #include <stddef.h>
 
-void alGizmoInit(AleGizmo *self) {
+void alGizmoInit(AlGizmo *self) {
 
     // load a flat shader here ?
     // the default raylib shader is flat though
-    self->initialClickInfo = (AleGizmo_InitialClickInfo){0};
+    self->initialClickInfo = (AlGizmo_InitialClickInfo){0};
     self->scale = 1.0f;
     self->position = Vector3Zero();
     self->gizmoType = Rotate;
@@ -26,13 +26,13 @@ void alGizmoInit(AleGizmo *self) {
     self->models[RotationYZ] = LoadModel("resources/translate_gizmo/Ring_YZ.glb");
 }
 
-void alGizmoDeinit(AleGizmo *self) {
+void alGizmoDeinit(AlGizmo *self) {
     for (int i = 0; i < MODELS_LEN; ++i) {
         UnloadModel(self->models[i]);
     }
 }
 
-bool alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera) {
+bool alGizmoTryHold(AlGizmo *self, Transform *transform, Camera3D camera) {
     // There's no currently active selected object
     if (transform == NULL) {
         self->isHidden = true;
@@ -46,7 +46,7 @@ bool alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera) {
 
     // TODO: This should not be here, this should be in tick(), but dependentPosition will be weakly owned.
     // Scale the size depending on the size
-    float scale = Vector3DistanceSqr(camera.position, transform->translation) / AleGizmo_MaximumDistanceScale;
+    float scale = Vector3DistanceSqr(camera.position, transform->translation) / AlGizmo_MaximumDistanceScale;
     scale = Clamp(scale, 0.25f, 1.0f);
     self->scale = scale;
     alGizmoScaleAll(self);
@@ -56,7 +56,7 @@ bool alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera) {
     Ray ray = GetMouseRay(mousePos, camera);
     if (!self->initialClickInfo.exist) {
         // This is initial click on arrow/plane in gizmo, let's save the initial clickInfo
-        AleGizmo_GrabAxis grabAxis = alGizmoGrabAxis(self, ray);
+        AlGizmo_GrabAxis grabAxis = alGizmoGrabAxis(self, ray);
 
         if (!grabAxis.rayCollision.hit) { // no arrows were clicked
             return false;
@@ -68,7 +68,7 @@ bool alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera) {
             return false;
         }
 
-        self->initialClickInfo = (AleGizmo_InitialClickInfo) {
+        self->initialClickInfo = (AlGizmo_InitialClickInfo) {
                 .exist = true,
                 .activeAxis = grabAxis.activeAxis,
                 .position = grabAxis.rayCollision.point,
@@ -107,11 +107,11 @@ bool alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera) {
     return true;
 }
 
-void alGizmoRelease(AleGizmo *self) {
-    self->initialClickInfo = (AleGizmo_InitialClickInfo) {0};
+void alGizmoRelease(AlGizmo *self) {
+    self->initialClickInfo = (AlGizmo_InitialClickInfo) {0};
 }
 
-void alGizmoScaleAll(AleGizmo *self) {
+void alGizmoScaleAll(AlGizmo *self) {
     self->models[ArrowX].transform = MatrixScale(self->scale, self->scale, self->scale);
     self->models[ArrowY].transform = MatrixScale(self->scale, self->scale, self->scale);
     self->models[ArrowZ].transform = MatrixScale(self->scale, self->scale, self->scale);
@@ -123,7 +123,7 @@ void alGizmoScaleAll(AleGizmo *self) {
     self->models[RotationYZ].transform = MatrixScale(self->scale, self->scale, self->scale);
 }
 
-AleGizmo_GrabAxis alGizmoGrabAxis(AleGizmo *self, Ray ray) {
+AlGizmo_GrabAxis alGizmoGrabAxis(AlGizmo *self, Ray ray) {
     Matrix transformTranslate = MatrixTranslate(self->position.x, self->position.y, self->position.z);
     Matrix transformScale = MatrixScale(self->scale, self->scale, self->scale);
     Matrix transform = MatrixMultiply(transformScale, transformTranslate);
@@ -131,51 +131,51 @@ AleGizmo_GrabAxis alGizmoGrabAxis(AleGizmo *self, Ray ray) {
     if (self->gizmoType == Translate || self->gizmoType == Scale) {
         RayCollision coll = GetRayCollisionMesh(ray, self->models[ArrowX].meshes[0], transform);
         if (coll.hit) {
-            return (AleGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = X};
+            return (AlGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = X};
         }
         coll = GetRayCollisionMesh(ray, self->models[ArrowY].meshes[0], transform);
         if (coll.hit) {
-            return (AleGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = Y};
+            return (AlGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = Y};
         }
         coll = GetRayCollisionMesh(ray, self->models[ArrowZ].meshes[0], transform);
         if (coll.hit) {
-            return (AleGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = Z};
+            return (AlGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = Z};
         }
         coll = GetRayCollisionMesh(ray, self->models[PlaneYZ].meshes[0], transform);
         if (coll.hit) {
-            return (AleGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = YZ};
+            return (AlGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = YZ};
         }
         coll = GetRayCollisionMesh(ray, self->models[PlaneXZ].meshes[0], transform);
         if (coll.hit) {
-            return (AleGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = XZ};
+            return (AlGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = XZ};
         }
         coll = GetRayCollisionMesh(ray, self->models[PlaneXY].meshes[0], transform);
         if (coll.hit) {
-            return (AleGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = XY};
+            return (AlGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = XY};
         }
     } else if (self->gizmoType == Rotate) {
         RayCollision coll = GetRayCollisionMesh(ray, self->models[RotationYZ].meshes[0], transform);
         if (coll.hit) {
-            return (AleGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = YZ};
+            return (AlGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = YZ};
         }
         coll = GetRayCollisionMesh(ray, self->models[RotationXZ].meshes[0], transform);
         if (coll.hit) {
-            return (AleGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = XZ};
+            return (AlGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = XZ};
         }
         coll = GetRayCollisionMesh(ray, self->models[RotationXY].meshes[0], transform);
         if (coll.hit) {
-            return (AleGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = XY};
+            return (AlGizmo_GrabAxis) { .rayCollision = coll, .activeAxis = XY};
         }
     }
 
-    return (AleGizmo_GrabAxis) {
+    return (AlGizmo_GrabAxis) {
         .rayCollision = (RayCollision) {
             .hit = false
         }
     };
 }
 
-RayCollision alGizmoRayPlaneIntersection(Ray ray, AleGizmo_ActiveAxis activeAxis, Vector3 planeCoord) {
+RayCollision alGizmoRayPlaneIntersection(Ray ray, AlGizmo_ActiveAxis activeAxis, Vector3 planeCoord) {
 
     Vector3 activeAxisDir;
     float t = 0.0f;
@@ -233,7 +233,7 @@ RayCollision alGizmoRayPlaneIntersection(Ray ray, AleGizmo_ActiveAxis activeAxis
     };
 }
 
-void alGizmoRender(const AleGizmo self) {
+void alGizmoRender(const AlGizmo self) {
     if (self.isHidden) {
         return;
     }
@@ -253,7 +253,7 @@ void alGizmoRender(const AleGizmo self) {
     }
 }
 
-Vector3 alGizmoHandleTranslate(AleGizmo *self, AleGizmo_ActiveAxis activeAxis, Vector3 rayPlaneHitPoint) {
+Vector3 alGizmoHandleTranslate(AlGizmo *self, AlGizmo_ActiveAxis activeAxis, Vector3 rayPlaneHitPoint) {
     Vector3 initialRayPos = Vector3Zero();
     if (activeAxis == X) {
         initialRayPos.x =

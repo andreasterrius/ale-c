@@ -4,7 +4,7 @@
 
 #include "object.h"
 
-void alObjectRecalculate(Object *self) {
+void alObjectRecalculate(AlObject *self) {
     Matrix matScale = MatrixScale(self->transform.scale.x, self->transform.scale.y, self->transform.scale.z);
     Matrix matRotation = QuaternionToMatrix(self->transform.rotation);
     Matrix matTranslation = MatrixTranslate(self->transform.translation.x,
@@ -15,7 +15,7 @@ void alObjectRecalculate(Object *self) {
     self->model.transform = matTransform;
 }
 
-void alObjectTryRecalculate(Object *self) {
+void alObjectTryRecalculate(AlObject *self) {
     if (self->hasTransformChanged) {
         alObjectRecalculate(self);
         self->hasTransformChanged = false;

@@ -3,39 +3,39 @@
 
 #include<raylib.h>
 
-typedef enum AleGizmo_ModelType {
+typedef enum AlGizmo_ModelType {
     ArrowX, ArrowY, ArrowZ,
     PlaneXY, PlaneXZ, PlaneYZ,
     RotationXY, RotationXZ, RotationYZ
-} AleGizmo_ModelType;
+} AlGizmo_ModelType;
 
-typedef enum AleGizmo_ActiveAxis {
+typedef enum AlGizmo_ActiveAxis {
     X, Y, Z, XY, XZ, YZ
-} AleGizmo_ActiveAxis;
+} AlGizmo_ActiveAxis;
 
 typedef enum AleGizmo_Type {
     Translate, Scale, Rotate
-} AleGizmo_Type;
+} AlGizmo_Type;
 
-static const float AleGizmo_MaximumDistanceScale = 1000.0f;
+static const float AlGizmo_MaximumDistanceScale = 1000.0f;
 
-typedef struct AleGizmo_InitialClickInfo {
+typedef struct AlGizmo_InitialClickInfo {
     bool exist;
-    AleGizmo_ActiveAxis activeAxis;
+    AlGizmo_ActiveAxis activeAxis;
     Vector3 position;
     // This is the position of the first initial click (only returns value for activeAxis)
     Vector3 firstRayPlaneHitPos;
     Vector3 initialSelfPos;
     // This is the position of last frame ray-plane intersection (only returns value for activeAxis)
     Vector3 lastFrameRayPlaneHitPos;
-} AleGizmo_InitialClickInfo;
+} AlGizmo_InitialClickInfo;
 
-typedef struct AleGizmo_GrabAxis {
+typedef struct AlGizmo_GrabAxis {
     RayCollision rayCollision;
-    AleGizmo_ActiveAxis activeAxis;
-} AleGizmo_GrabAxis;
+    AlGizmo_ActiveAxis activeAxis;
+} AlGizmo_GrabAxis;
 
-typedef struct AleGizmo {
+typedef struct AlGizmo {
 #define MODELS_LEN 9
     // Meshes
     Model models[MODELS_LEN];
@@ -44,35 +44,35 @@ typedef struct AleGizmo {
     bool isHidden;
     Vector3 position;
     float scale;
-    AleGizmo_Type gizmoType;
+    AlGizmo_Type gizmoType;
 
     // if not null, then user has selected one of the axis
-    AleGizmo_InitialClickInfo initialClickInfo;
-} AleGizmo;
+    AlGizmo_InitialClickInfo initialClickInfo;
+} AlGizmo;
 
-void alGizmoInit(AleGizmo *self);
+void alGizmoInit(AlGizmo *self);
 
 /// This usually happens when user press and holding left click (handled by caller)
 /// This function is paired with release()
 /// Return bool if it's holding something
-bool alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera);
+bool alGizmoTryHold(AlGizmo *self, Transform *transform, Camera3D camera);
 
-void alGizmoRelease(AleGizmo *self);
+void alGizmoRelease(AlGizmo *self);
 
-void alGizmoDeinit(AleGizmo *self);
+void alGizmoDeinit(AlGizmo *self);
 
-void alGizmoRender(AleGizmo self);
+void alGizmoRender(AlGizmo self);
 
-static void alGizmoScaleAll(AleGizmo *self);
+static void alGizmoScaleAll(AlGizmo *self);
 
-static AleGizmo_GrabAxis alGizmoGrabAxis(AleGizmo *self, Ray ray);
+static AlGizmo_GrabAxis alGizmoGrabAxis(AlGizmo *self, Ray ray);
 
 /// This returns the hit point position of ONLY the activeAxis (all else will be 0)
-static RayCollision alGizmoRayPlaneIntersection(Ray ray, AleGizmo_ActiveAxis activeAxis, Vector3 planeCoord);
+static RayCollision alGizmoRayPlaneIntersection(Ray ray, AlGizmo_ActiveAxis activeAxis, Vector3 planeCoord);
 
 /// This will return the new position (not the delta)
 /// I want it to snap to the where the mouse ray is intersecting the activeAxis
-static Vector3 alGizmoHandleTranslate(AleGizmo *self, AleGizmo_ActiveAxis activeAxis, Vector3 rayPlaneHitPoint);
+static Vector3 alGizmoHandleTranslate(AlGizmo *self, AlGizmo_ActiveAxis activeAxis, Vector3 rayPlaneHitPoint);
 
 /// Unlike translation, this will return the delta instead
 //static void alGizmoGetRayplaneHitPosDelta(AleGizmo *self, AleGizmo_ActiveAxis activeAxis, Vector3 rayPlaneHitPoint, Vector3 );

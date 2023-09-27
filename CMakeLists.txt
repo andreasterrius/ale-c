@@ -15,7 +15,9 @@ add_executable(gizmo_demo gizmo_demo.c
         gizmo.h
         gizmo.c
         object.c
-        object.h)
+        object.h
+        arc_camera.h
+        arc_camera.c)
 target_include_directories(gizmo_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
 target_link_libraries(gizmo_demo PRIVATE ${GLIB_LIBRARIES} raylib)
 

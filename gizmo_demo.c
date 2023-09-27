@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    Object object;
+    AlObject object;
     object.transform = (Transform) {
             .translation = Vector3Zero(),
             .rotation = QuaternionIdentity(),
@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     object.model = LoadModelFromMesh(GenMeshCube(2.0f, 1.0f, 1.0f));
     object.transform = (Transform) {.translation = Vector3Zero(), .scale = Vector3One(), .rotation = QuaternionIdentity()};
 
-    AleGizmo gizmo;
+    AlGizmo gizmo;
     alGizmoInit(&gizmo);
 
     while (!WindowShouldClose()) {
