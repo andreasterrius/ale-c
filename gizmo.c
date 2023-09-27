@@ -12,7 +12,7 @@ void alGizmoInit(AleGizmo *self) {
     self->initialClickInfo = (AleGizmo_InitialClickInfo){0};
     self->scale = 1.0f;
     self->position = Vector3Zero();
-    self->gizmoType = Scale;
+    self->gizmoType = Rotate;
     self->isHidden =  true;
 
     self->models[ArrowX] = LoadModel("resources/translate_gizmo/Arrow_X+.glb");
@@ -32,11 +32,11 @@ void alGizmoDeinit(AleGizmo *self) {
     }
 }
 
-void alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera) {
+bool alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera) {
     // There's no currently active selected object
     if (transform == NULL) {
         self->isHidden = true;
-        return;
+        return false;
     }
 
     // There's an active selected object
@@ -59,13 +59,13 @@ void alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera) {
         AleGizmo_GrabAxis grabAxis = alGizmoGrabAxis(self, ray);
 
         if (!grabAxis.rayCollision.hit) { // no arrows were clicked
-            return;
+            return false;
         }
 
         // Get a ray to plane intersection.
         RayCollision rayPlaneHit = alGizmoRayPlaneIntersection(ray, grabAxis.activeAxis, self->position);
         if (!rayPlaneHit.hit) {
-            return;
+            return false;
         }
 
         self->initialClickInfo = (AleGizmo_InitialClickInfo) {
@@ -82,11 +82,6 @@ void alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera) {
 
         // Ignore ray-plane parallel cases
         if (rayPlaneHit.hit) {
-
-            // TODO: Separate Translate and Scale handling here
-            // For translate handling, it's set position (on curr ray hit) - initial offset
-            // For scale handling, it's a delta change from last frame pos to now
-            // For rotation handling, it's also a delta change last frame pos to now, but we do quarternion stuff afterwards
             if(self->gizmoType == Translate) {
                 Vector3 newPos = alGizmoHandleTranslate(self, self->initialClickInfo.activeAxis, rayPlaneHit.point);
                 self->position = newPos;
@@ -96,13 +91,20 @@ void alGizmoTryHold(AleGizmo *self, Transform *transform, Camera3D camera) {
                 Vector3 delta = Vector3Subtract(rayPlaneHit.point, self->initialClickInfo.lastFrameRayPlaneHitPos);
                 transform->scale = Vector3Add(transform->scale, delta);
             } else if(self->gizmoType == Rotate) {
-                //alGizmoHandleRotate();
-            }
+                Vector3 unitVecA = Vector3Subtract(rayPlaneHit.point, self->position);
+                Vector3 unitVecB = Vector3Subtract(self->initialClickInfo.lastFrameRayPlaneHitPos, self->position);
 
+                Vector4 delta = QuaternionFromVector3ToVector3(unitVecB, unitVecA);
+                //not commutative, multiply order matters!
+                // world rotation
+                transform->rotation = QuaternionMultiply(delta, transform->rotation);
+                // local rotation : QuaternionMultiply(transform->rotation, delta);
+            }
             self->initialClickInfo.lastFrameRayPlaneHitPos = rayPlaneHit.point;
         }
     }
 
+    return true;
 }
 
 void alGizmoRelease(AleGizmo *self) {

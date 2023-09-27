@@ -10,9 +10,16 @@ pkg_check_modules(GLIB REQUIRED glib-2.0)
 ## raylib
 add_subdirectory(extern/raylib)
 
-## hello_c
+## gizmo_demo
 add_executable(gizmo_demo gizmo_demo.c
         gizmo.h
-        gizmo.c)
+        gizmo.c
+        object.c
+        object.h)
 target_include_directories(gizmo_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
 target_link_libraries(gizmo_demo PRIVATE ${GLIB_LIBRARIES} raylib)
+
+## arc_camera
+add_executable(arc_camera_demo arc_camera_demo.c)
+target_include_directories(arc_camera_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
+target_link_libraries(arc_camera_demo PRIVATE ${GLIB_LIBRARIES} raylib)

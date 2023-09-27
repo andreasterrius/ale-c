@@ -1,14 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <raylib.h>
 #include <raymath.h>
 #include "gizmo.h"
-
-typedef struct Object {
-    Transform transform;
-    Model model;
-} Object;
+#include "object.h"
 
 int main(int argc, char **argv) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -29,39 +22,35 @@ int main(int argc, char **argv) {
             .scale = Vector3One(),
     };
     object.model = LoadModelFromMesh(GenMeshCube(2.0f, 1.0f, 1.0f));
+    object.transform = (Transform) {.translation = Vector3Zero(), .scale = Vector3One(), .rotation = QuaternionIdentity()};
 
     AleGizmo gizmo;
     alGizmoInit(&gizmo);
 
     while (!WindowShouldClose()) {
-//        UpdateCamera(&camera, CAMERA);
-        {
-            BeginDrawing();
-            ClearBackground(SKYBLUE);
-            DrawFPS(10, 10);
+        BeginDrawing();
+        ClearBackground(SKYBLUE);
+        DrawFPS(10, 10);
 
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                alGizmoTryHold(&gizmo, &object.transform, camera);
-            } else {
-                alGizmoRelease(&gizmo);
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            if (alGizmoTryHold(&gizmo, &object.transform, camera)) {
+                object.hasTransformChanged = true;
             }
-
-            DrawText("gizmo demo!", 100, 100, 20, YELLOW);
-            BeginMode3D(camera);
-
-            alGizmoRender(gizmo);
-
-            Vector3 outAxis;
-            float outAngle;
-
-            QuaternionToAxisAngle(object.transform.rotation, &outAxis, &outAngle);
-            DrawModelEx(object.model, object.transform.translation, outAxis, outAngle, object.transform.scale, WHITE);
-            //DrawModel(object.model, object.transform.translation, 1.0f, WHITE);
-            DrawGrid(10, 1.0f);
-
-            EndMode3D();
-            EndDrawing();
+        } else {
+            alGizmoRelease(&gizmo);
         }
+
+        DrawText("gizmo demo!", 100, 100, 20, YELLOW);
+        BeginMode3D(camera);
+
+        alObjectTryRecalculate(&object);
+        alGizmoRender(gizmo);
+
+        DrawModel(object.model, Vector3Zero(), 1.0f, WHITE);
+        DrawGrid(10, 1.0f);
+
+        EndMode3D();
+        EndDrawing();
     }
 
     alGizmoDeinit(&gizmo);
