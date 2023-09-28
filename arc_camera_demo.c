@@ -1,6 +1,6 @@
-#include<stdio.h>
 #include<raylib.h>
 #include<raymath.h>
+#include"arc_camera.h"
 
 int main() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -16,14 +16,22 @@ int main() {
 
     Model model = LoadModelFromMesh(GenMeshCube(2.0f, 2.0f, 2.0f));
 
+    AlArcCameraInput alArcCameraInput;
+    alArcCameraInputInit(&alArcCameraInput);
+
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(SKYBLUE);
         DrawFPS(10, 10);
 
-        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            Vector2 mouseMovement = GetMousePosition();
+        if(IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
+            HideCursor();
+            alArcCameraInputTryArcBall(&alArcCameraInput, &camera);
+        } else {
+            ShowCursor();
+            alArcCameraInputReleaseArcBall(&alArcCameraInput);
         }
+        alArcCameraInputZoomOut(&alArcCameraInput, &camera);
 
         DrawText("arc camera demo!", 100, 100, 20, YELLOW);
         BeginMode3D(camera);
