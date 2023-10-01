@@ -37,6 +37,16 @@ add_executable(scene_editor
         object.c
         object.h
         scene_editor.c
-        scene_editor.h)
+        scene_editor.h
+        viewport_demo.c)
 target_include_directories(scene_editor PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
 target_link_libraries(scene_editor PRIVATE ${GLIB_LIBRARIES} raylib)
+
+## viewport_demo
+add_executable(viewport_demo
+        viewport_demo.c
+        arc_camera.c
+        arc_camera.h
+)
+target_include_directories(viewport_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
+target_link_libraries(viewport_demo PRIVATE ${GLIB_LIBRARIES} raylib)
