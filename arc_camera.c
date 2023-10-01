@@ -1,4 +1,5 @@
 #include "arc_camera.h"
+#include <stdio.h>
 
 AlArcCameraInput alArcCameraInputInit(AlArcCameraInput *self) {
     self->isHeld = false,
@@ -6,9 +7,11 @@ AlArcCameraInput alArcCameraInputInit(AlArcCameraInput *self) {
 }
 
 void alArcCameraInputTryArcBall(AlArcCameraInput *self, Camera3D *camera) {
+    printf("in: %d\n", self->isHeld);
     if(!self->isHeld) {
         self->lastFrameMousePos = GetMousePosition();
         self->isHeld = true;
+        printf("%d\n", self->isHeld);
         return;
     }
     // isHeld: true
@@ -26,6 +29,8 @@ void alArcCameraInputTryArcBall(AlArcCameraInput *self, Camera3D *camera) {
 
     Vector3 pivotToPosition  = Vector3Subtract(camera->position, camera->target);
     camera->position = Vector3RotateByQuaternion(pivotToPosition, combined);
+
+    printf("%f %f %f\n", camera->position.x, camera->position.y, camera->position.z);
 }
 
 void alArcCameraInputReleaseArcBall(AlArcCameraInput *self) {

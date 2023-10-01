@@ -16,4 +16,6 @@ void alObjectRecalculate(AlObject *self);
 // should be called before rendering/after update
 void alObjectTryRecalculate(AlObject *self);
 
+void alObjectDeinit(AlObject *self);
+
 #endif //HELLO_C_OBJECT_H

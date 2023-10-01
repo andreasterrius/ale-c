@@ -4,6 +4,7 @@
 #include "gizmo.h"
 #include "raymath.h"
 #include <stddef.h>
+#include <stdio.h>
 
 void alGizmoInit(AlGizmo *self) {
 
@@ -12,7 +13,7 @@ void alGizmoInit(AlGizmo *self) {
     self->initialClickInfo = (AlGizmo_InitialClickInfo){0};
     self->scale = 1.0f;
     self->position = Vector3Zero();
-    self->gizmoType = Rotate;
+    self->gizmoType = Translate;
     self->isHidden =  true;
 
     self->models[ArrowX] = LoadModel("resources/translate_gizmo/Arrow_X+.glb");
@@ -54,6 +55,7 @@ bool alGizmoTryHold(AlGizmo *self, Transform *transform, Camera3D camera) {
     // Try to check which arrow we're hitting
     Vector2 mousePos = GetMousePosition();
     Ray ray = GetMouseRay(mousePos, camera);
+
     if (!self->initialClickInfo.exist) {
         // This is initial click on arrow/plane in gizmo, let's save the initial clickInfo
         AlGizmo_GrabAxis grabAxis = alGizmoGrabAxis(self, ray);
@@ -76,32 +78,33 @@ bool alGizmoTryHold(AlGizmo *self, Transform *transform, Camera3D camera) {
                 .initialSelfPos = self->position,
                 .lastFrameRayPlaneHitPos = rayPlaneHit.point,
         };
-    } else {
-        // This is no longer initial hit, but is a dragging movement
-        RayCollision rayPlaneHit = alGizmoRayPlaneIntersection(ray, self->initialClickInfo.activeAxis, self->position);
+        return true;
+    }
 
-        // Ignore ray-plane parallel cases
-        if (rayPlaneHit.hit) {
-            if(self->gizmoType == Translate) {
-                Vector3 newPos = alGizmoHandleTranslate(self, self->initialClickInfo.activeAxis, rayPlaneHit.point);
-                self->position = newPos;
-                transform->translation = newPos;
-            } else if(self->gizmoType == Scale) {
-                // unlike translate, we just return delta here
-                Vector3 delta = Vector3Subtract(rayPlaneHit.point, self->initialClickInfo.lastFrameRayPlaneHitPos);
-                transform->scale = Vector3Add(transform->scale, delta);
-            } else if(self->gizmoType == Rotate) {
-                Vector3 unitVecA = Vector3Subtract(rayPlaneHit.point, self->position);
-                Vector3 unitVecB = Vector3Subtract(self->initialClickInfo.lastFrameRayPlaneHitPos, self->position);
+    // This is no longer initial hit, but is a dragging movement
+    RayCollision rayPlaneHit = alGizmoRayPlaneIntersection(ray, self->initialClickInfo.activeAxis, self->position);
 
-                Vector4 delta = QuaternionFromVector3ToVector3(unitVecB, unitVecA);
-                //not commutative, multiply order matters!
-                // world rotation
-                transform->rotation = QuaternionMultiply(delta, transform->rotation);
-                // local rotation : QuaternionMultiply(transform->rotation, delta);
-            }
-            self->initialClickInfo.lastFrameRayPlaneHitPos = rayPlaneHit.point;
+    // Ignore ray-plane parallel cases
+    if (rayPlaneHit.hit) {
+        if(self->gizmoType == Translate) {
+            Vector3 newPos = alGizmoHandleTranslate(self, self->initialClickInfo.activeAxis, rayPlaneHit.point);
+            self->position = newPos;
+            transform->translation = newPos;
+        } else if(self->gizmoType == Scale) {
+            // unlike translate, we just return delta here
+            Vector3 delta = Vector3Subtract(rayPlaneHit.point, self->initialClickInfo.lastFrameRayPlaneHitPos);
+            transform->scale = Vector3Add(transform->scale, delta);
+        } else if(self->gizmoType == Rotate) {
+            Vector3 unitVecA = Vector3Subtract(rayPlaneHit.point, self->position);
+            Vector3 unitVecB = Vector3Subtract(self->initialClickInfo.lastFrameRayPlaneHitPos, self->position);
+
+            Vector4 delta = QuaternionFromVector3ToVector3(unitVecB, unitVecA);
+            //not commutative, multiply order matters!
+            // world rotation
+            transform->rotation = QuaternionMultiply(delta, transform->rotation);
+            // local rotation : QuaternionMultiply(transform->rotation, delta);
         }
+        self->initialClickInfo.lastFrameRayPlaneHitPos = rayPlaneHit.point;
     }
 
     return true;

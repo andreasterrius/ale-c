@@ -26,3 +26,17 @@ add_executable(arc_camera_demo
         arc_camera_demo.c)
 target_include_directories(arc_camera_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
 target_link_libraries(arc_camera_demo PRIVATE ${GLIB_LIBRARIES} raylib)
+
+## scene_editor
+add_executable(scene_editor
+        scene_editor_demo.c
+        arc_camera.h
+        arc_camera.c
+        gizmo.h
+        gizmo.c
+        object.c
+        object.h
+        scene_editor.c
+        scene_editor.h)
+target_include_directories(scene_editor PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
+target_link_libraries(scene_editor PRIVATE ${GLIB_LIBRARIES} raylib)
