@@ -4,22 +4,24 @@
 
 #include <stdio.h>
 #include "scene_editor.h"
+#include "defer.h"
 
-void alSceneEditorInit(AlSceneEditor *self, Vector2 *windowSize) {
+void alSceneEditorInit(AlSceneEditor *self, Camera3D camera, Vector2 *windowSize) {
     self->selectedObject = NULL;
     self->objects = g_array_new(false, false, sizeof(AlObject));
+    self->camera = camera;
     alGizmoInit(&self->gizmo);
-    alViewportInit(&self->gizmoViewport, Vector2Zero(), (Vector2) {.x=600, .y=400}, windowSize);
+    alRttInit(&self->gizmoViewport, NULL);
     alArcCameraInputInit(&self->arcCameraInput);
 }
 
-void alSceneEditorHandleInput(AlSceneEditor *self, Camera *cam) {
+void alSceneEditorHandleInput(AlSceneEditor *self) {
     // try selecting an object
     // handle gizmo
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-        bool clickedSomething = alSceneEditorSelectObject(self, cam);
+        bool clickedSomething = alSceneEditorSelectObject(self);
 
-        if (alGizmoTryHold(&self->gizmo, &self->selectedObject->transform, *cam)) {
+        if (alGizmoTryHold(&self->gizmo, &self->selectedObject->transform, self->camera)) {
             self->selectedObject->hasTransformChanged = true;
             alObjectTryRecalculate(self->selectedObject);
             clickedSomething = true;
@@ -33,16 +35,16 @@ void alSceneEditorHandleInput(AlSceneEditor *self, Camera *cam) {
 
     // handle camera
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-        alArcCameraInputTryArcBall(&self->arcCameraInput, cam);
+        alArcCameraInputTryArcBall(&self->arcCameraInput, &self->camera);
     } else {
         alArcCameraInputReleaseArcBall(&self->arcCameraInput);
     }
-    alArcCameraInputZoomOut(&self->arcCameraInput, cam);
+    alArcCameraInputZoomOut(&self->arcCameraInput, &self->camera);
 }
 
 void alSceneEditorDeinit(AlSceneEditor *self) {
     alGizmoDeinit(&self->gizmo);
-    alViewportDeinit(&self->gizmoViewport);
+    alRttDeinit(&self->gizmoViewport);
     for (int i = 0; i < self->objects->len; ++i) {
         AlObject obj = g_array_index(self->objects, AlObject, i);
         alObjectDeinit(&obj);
@@ -50,8 +52,8 @@ void alSceneEditorDeinit(AlSceneEditor *self) {
     g_array_free(self->objects, true);
 }
 
-bool alSceneEditorSelectObject(AlSceneEditor *self, Camera3D *cam) {
-    Ray ray = GetMouseRay(GetMousePosition(), *cam);
+bool alSceneEditorSelectObject(AlSceneEditor *self) {
+    Ray ray = GetMouseRay(GetMousePosition(), self->camera);
     for (int i = 0; i < self->objects->len; ++i) {
         AlObject *obj = &g_array_index(self->objects, AlObject, i);
         for (int j = 0; j < obj->model.meshCount; ++j) {
@@ -69,10 +71,42 @@ void alSceneEditorDeselectObject(AlSceneEditor *self) {
     self->selectedObject = NULL;
 }
 
-void alSceneEditorRender(AlSceneEditor *self) {
-    for (int i = 0; i < self->objects->len; ++i) {
-        AlObject obj = g_array_index(self->objects, AlObject, i);
-        DrawModel(obj.model, Vector3Zero(), 1.0f, WHITE);
+void alSceneEditorRender(const AlSceneEditor *self) {
+
+    // Draw Gizmo
+    {
+        alRttBeginRender(&self->gizmoViewport);
+        defer { alRttEndRender(self->gizmoViewport); };
+
+        DrawFPS(10, 10);
+        DrawText("scene editor demo!", 100, 100, 20, YELLOW);
+
+        BeginMode3D(self->camera);
+        defer{ EndMode3D(); };
+
+        alGizmoRender(self->gizmo);
     }
-    alGizmoRender(self->gizmo);
+
+    // Draw everything to screen
+    {
+        BeginDrawing();
+        defer{ EndDrawing(); };
+
+        ClearBackground(SKYBLUE);
+
+        // Draw objects
+        {
+            BeginMode3D(self->camera);
+            defer{ EndMode3D(); };
+            for (int i = 0; i < self->objects->len; ++i) {
+                AlObject obj = g_array_index(self->objects, AlObject, i);
+                DrawModel(obj.model, Vector3Zero(), 1.0f, WHITE);
+            }
+            DrawGrid(10, 1.0f);
+        }
+
+        // Draw textures
+        alRttRenderToScreen(self->gizmoViewport);
+    }
+
 }

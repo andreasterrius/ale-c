@@ -4,7 +4,6 @@
 #include "gizmo.h"
 #include "raymath.h"
 #include <stddef.h>
-#include <stdio.h>
 
 void alGizmoInit(AlGizmo *self) {
 

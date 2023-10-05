@@ -2,6 +2,7 @@
 #define HELLO_C_GIZMO_H
 
 #include<raylib.h>
+#include"rtt.h"
 
 typedef enum AlGizmo_ModelType {
     ArrowX, ArrowY, ArrowZ,

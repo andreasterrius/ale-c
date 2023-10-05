@@ -3,7 +3,8 @@
 //
 #include<raylib.h>
 #include<raymath.h>
-#include"viewport.h"
+#include <stdio.h>
+#include"rtt.h"
 #include"arc_camera.h"
 #include"defer.h"
 
@@ -11,7 +12,7 @@ int main(int argc, char **argv) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
     Vector2 windowSize = (Vector2) {.x = 800, .y = 800};
-    InitWindow(windowSize.x, windowSize.y, "Hello Gizmo");
+    InitWindow(windowSize.x, windowSize.y, "Hello render to texture");
     defer{ CloseWindow(); };
 
     SetTargetFPS(60);
@@ -29,13 +30,9 @@ int main(int argc, char **argv) {
     Model model = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
     defer{ UnloadModel(model); };
 
-    AlViewport viewport;
-    alViewportInit(&viewport,
-                   (Vector2) {.x = -200, .y = -200},
-                   (Vector2) {.x = 600, .y = 400},
-                   &windowSize
-    );
-    defer { alViewportDeinit(&viewport); };
+    AlRtt viewport;
+    alRttInit(&viewport, NULL);
+    defer { alRttDeinit(&viewport); };
 
     Ray ray = GetMouseRay(GetMousePosition(), camera);
     while (!WindowShouldClose()) {
@@ -49,12 +46,12 @@ int main(int argc, char **argv) {
         }
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            ray = alViewportGetMouseRay(viewport, camera);
+            ray = alRttGetMouseRay(viewport, camera);
         }
 
         {
-            alViewportBeginRender(viewport);
-            defer { alViewportEndRender(viewport); };
+            alRttBeginRender(&viewport);
+            defer { alRttEndRender(viewport); };
 
             DrawFPS(10, 10);
             DrawText("viewport demo!", 100, 100, 20, YELLOW);
@@ -73,12 +70,9 @@ int main(int argc, char **argv) {
             BeginDrawing();
             defer{ EndDrawing(); };
 
+            alRttRenderToScreen(viewport);
 
-            BeginBlendMode(BLEND_ALPHA);
-                alViewportRenderToScreen(viewport);
-            EndBlendMode();
-
-            ClearBackground(RED);
+            ClearBackground(SKYBLUE);
         }
     }
 

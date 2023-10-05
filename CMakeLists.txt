@@ -38,22 +38,22 @@ add_executable(scene_editor
         object.h
         scene_editor.c
         scene_editor.h
-        viewport.c
-        viewport.h)
+        rtt.c
+        rtt.h)
 target_compile_options(scene_editor PRIVATE -fblocks)
 target_include_directories(scene_editor PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
 target_link_libraries(scene_editor PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime)
 
 ## viewport_demo
-add_executable(viewport_demo
-        viewport_demo.c
-        viewport.c
-        viewport.h
+add_executable(rtt_demo
+        rtt_demo.c
+        rtt.c
+        rtt.h
         arc_camera.c
         arc_camera.h
         defer.h
 )
 
-target_compile_options(viewport_demo PRIVATE -fblocks)
-target_include_directories(viewport_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
-target_link_libraries(viewport_demo PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime)
+target_compile_options(rtt_demo PRIVATE -fblocks)
+target_include_directories(rtt_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
+target_link_libraries(rtt_demo PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime)

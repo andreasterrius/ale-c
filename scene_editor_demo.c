@@ -13,16 +13,16 @@ int main(int argc, char **argv) {
 
     SetTargetFPS(60);
 
-    AlSceneEditor sceneEditor;
-    alSceneEditorInit(&sceneEditor, &windowSize);
-    defer{ alSceneEditorDeinit(&sceneEditor); };
-
     Camera3D camera;
     camera.position = (Vector3) {2.0f, 4.0f, -10.0f};
     camera.target = Vector3Zero();
     camera.up = (Vector3) {0.0f, 1.0f, 0.0f};
     camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
+
+    AlSceneEditor sceneEditor;
+    alSceneEditorInit(&sceneEditor, camera, &windowSize);
+    defer{ alSceneEditorDeinit(&sceneEditor); };
 
     AlObject object;
     object.transform = (Transform) {
@@ -45,17 +45,8 @@ int main(int argc, char **argv) {
 //    g_array_append_val(sceneEditor.objects, anotherObject);
 
     while (!WindowShouldClose()) {
-        BeginDrawing();
-        defer{ EndDrawing(); };
-        ClearBackground(SKYBLUE);
-        DrawFPS(10, 10);
 
-        DrawText("scene editor demo!", 100, 100, 20, YELLOW);
-
-        BeginMode3D(camera);
-        defer{ EndMode3D(); };
-
-        alSceneEditorHandleInput(&sceneEditor, &camera);
+        alSceneEditorHandleInput(&sceneEditor);
         alObjectTryRecalculate(&object);
 
         alSceneEditorRender(&sceneEditor);
