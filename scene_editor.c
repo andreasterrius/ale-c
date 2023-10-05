@@ -5,10 +5,11 @@
 #include <stdio.h>
 #include "scene_editor.h"
 
-void alSceneEditorInit(AlSceneEditor *self) {
+void alSceneEditorInit(AlSceneEditor *self, Vector2 *windowSize) {
     self->selectedObject = NULL;
     self->objects = g_array_new(false, false, sizeof(AlObject));
     alGizmoInit(&self->gizmo);
+    alViewportInit(&self->gizmoViewport, Vector2Zero(), (Vector2) {.x=600, .y=400}, windowSize);
     alArcCameraInputInit(&self->arcCameraInput);
 }
 
@@ -23,7 +24,7 @@ void alSceneEditorHandleInput(AlSceneEditor *self, Camera *cam) {
             alObjectTryRecalculate(self->selectedObject);
             clickedSomething = true;
         }
-        if(!clickedSomething) {
+        if (!clickedSomething) {
             alSceneEditorDeselectObject(self);
         }
     } else {
@@ -31,7 +32,7 @@ void alSceneEditorHandleInput(AlSceneEditor *self, Camera *cam) {
     }
 
     // handle camera
-    if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
         alArcCameraInputTryArcBall(&self->arcCameraInput, cam);
     } else {
         alArcCameraInputReleaseArcBall(&self->arcCameraInput);
@@ -41,7 +42,8 @@ void alSceneEditorHandleInput(AlSceneEditor *self, Camera *cam) {
 
 void alSceneEditorDeinit(AlSceneEditor *self) {
     alGizmoDeinit(&self->gizmo);
-    for(int i = 0 ; i < self->objects->len; ++i){
+    alViewportDeinit(&self->gizmoViewport);
+    for (int i = 0; i < self->objects->len; ++i) {
         AlObject obj = g_array_index(self->objects, AlObject, i);
         alObjectDeinit(&obj);
     }
@@ -50,11 +52,11 @@ void alSceneEditorDeinit(AlSceneEditor *self) {
 
 bool alSceneEditorSelectObject(AlSceneEditor *self, Camera3D *cam) {
     Ray ray = GetMouseRay(GetMousePosition(), *cam);
-    for(int i = 0; i < self->objects->len; ++i){
+    for (int i = 0; i < self->objects->len; ++i) {
         AlObject *obj = &g_array_index(self->objects, AlObject, i);
-        for (int j = 0; j < obj->model.meshCount; ++j){
+        for (int j = 0; j < obj->model.meshCount; ++j) {
             RayCollision rayCollision = GetRayCollisionMesh(ray, obj->model.meshes[j], obj->model.transform);
-            if(rayCollision.hit) {
+            if (rayCollision.hit) {
                 self->selectedObject = obj; //dangerous? anyway selectedObject is non owning
                 return true;
             }
@@ -68,7 +70,7 @@ void alSceneEditorDeselectObject(AlSceneEditor *self) {
 }
 
 void alSceneEditorRender(AlSceneEditor *self) {
-    for(int i = 0; i < self->objects->len; ++i){
+    for (int i = 0; i < self->objects->len; ++i) {
         AlObject obj = g_array_index(self->objects, AlObject, i);
         DrawModel(obj.model, Vector3Zero(), 1.0f, WHITE);
     }

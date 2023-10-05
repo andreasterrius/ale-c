@@ -2,14 +2,20 @@
 #include <raymath.h>
 #include "object.h"
 #include "scene_editor.h"
+#include "defer.h"
 
 int main(int argc, char **argv) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(800, 800, "Hello Gizmo");
+
+    Vector2 windowSize = (Vector2) {.x = 800, .y=800};
+    InitWindow(windowSize.x, windowSize.y, "Hello Editor");
+    defer{ CloseWindow(); };
+
     SetTargetFPS(60);
 
     AlSceneEditor sceneEditor;
-    alSceneEditorInit(&sceneEditor);
+    alSceneEditorInit(&sceneEditor, &windowSize);
+    defer{ alSceneEditorDeinit(&sceneEditor); };
 
     Camera3D camera;
     camera.position = (Vector3) {2.0f, 4.0f, -10.0f};
@@ -40,11 +46,14 @@ int main(int argc, char **argv) {
 
     while (!WindowShouldClose()) {
         BeginDrawing();
+        defer{ EndDrawing(); };
         ClearBackground(SKYBLUE);
         DrawFPS(10, 10);
 
         DrawText("scene editor demo!", 100, 100, 20, YELLOW);
+
         BeginMode3D(camera);
+        defer{ EndMode3D(); };
 
         alSceneEditorHandleInput(&sceneEditor, &camera);
         alObjectTryRecalculate(&object);
@@ -52,12 +61,7 @@ int main(int argc, char **argv) {
         alSceneEditorRender(&sceneEditor);
 
         DrawGrid(10, 1.0f);
-
-        EndMode3D();
-        EndDrawing();
     }
 
-    alSceneEditorDeinit(&sceneEditor);
-    CloseWindow();
     return 0;
 }

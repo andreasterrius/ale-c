@@ -3,21 +3,17 @@
 //
 #include<raylib.h>
 #include<raymath.h>
+#include"viewport.h"
 #include"arc_camera.h"
-
-// Adjusted for a corrected viewport drawing.
-Vector2 GetMousePositionCorrected(Vector2 oldSize, Vector2 offset, Vector2 newSize) {
-    Vector2 mousePos = GetMousePosition();
-    Vector2 resultPos = (Vector2){
-        .x = oldSize.x / newSize.x * (offset.x+mousePos.x),
-        .y = oldSize.y / newSize.y * (offset.y+mousePos.y)
-    };
-    return resultPos;
-}
+#include"defer.h"
 
 int main(int argc, char **argv) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(800, 800, "Hello Gizmo");
+
+    Vector2 windowSize = (Vector2) {.x = 800, .y = 800};
+    InitWindow(windowSize.x, windowSize.y, "Hello Gizmo");
+    defer{ CloseWindow(); };
+
     SetTargetFPS(60);
 
     Camera3D camera;
@@ -31,10 +27,16 @@ int main(int argc, char **argv) {
     alArcCameraInputInit(&alArcCameraInput);
 
     Model model = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
-    RenderTexture2D target = LoadRenderTexture(600, 400);
+    defer{ UnloadModel(model); };
 
-    //Vector2 offset = Vector2Zero();
-    Vector2 offset = (Vector2) {.x = -200, .y = -200};
+    AlViewport viewport;
+    alViewportInit(&viewport,
+                   (Vector2) {.x = -200, .y = -200},
+                   (Vector2) {.x = 600, .y = 400},
+                   &windowSize
+    );
+    defer { alViewportDeinit(&viewport); };
+
     Ray ray = GetMouseRay(GetMousePosition(), camera);
     while (!WindowShouldClose()) {
 
@@ -47,45 +49,38 @@ int main(int argc, char **argv) {
         }
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            Vector2 mousePos = GetMousePositionCorrected(
-                    (Vector2) {.x=GetScreenWidth(), .y=GetScreenHeight()},
-                    offset,
-                    (Vector2) {.x=target.texture.width, .y=target.texture.height});
-            ray = GetMouseRay(mousePos, camera);
+            ray = alViewportGetMouseRay(viewport, camera);
         }
 
         {
-            BeginTextureMode(target);
-            ClearBackground(SKYBLUE);
+            alViewportBeginRender(viewport);
+            defer { alViewportEndRender(viewport); };
+
             DrawFPS(10, 10);
             DrawText("viewport demo!", 100, 100, 20, YELLOW);
 
+            ClearBackground(ColorAlpha(SKYBLUE, 0.0f));
             BeginMode3D(camera);
+            defer{ EndMode3D(); };
             DrawRay(ray, RED);
 
             DrawModel(model, Vector3Zero(), 1.0f, WHITE);
 
             DrawGrid(10, 1.0f);
-
-            EndMode3D();
-            EndTextureMode();
         }
 
         {
             BeginDrawing();
+            defer{ EndDrawing(); };
 
-            ClearBackground(RAYWHITE);
-            DrawTexturePro(target.texture,
-                           (Rectangle) {0.0f, 0.0f, (float) target.texture.width, -target.texture.height},
-                           (Rectangle) {0.0f, 0.0f, (float) target.texture.width, target.texture.height},
-                           offset, 0.0f, WHITE);
 
-            EndDrawing();
+            BeginBlendMode(BLEND_ALPHA);
+                alViewportRenderToScreen(viewport);
+            EndBlendMode();
+
+            ClearBackground(RED);
         }
     }
 
-    UnloadRenderTexture(target);
-    UnloadModel(model);
-    CloseWindow();
     return 0;
 }
