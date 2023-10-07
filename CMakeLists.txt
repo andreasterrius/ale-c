@@ -7,8 +7,9 @@ set(CMAKE_C_STANDARD 23)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 
-## raylib
+## dependencies
 add_subdirectory(extern/raylib)
+add_subdirectory(extern/cJSON)
 
 ## gizmo_demo
 add_executable(gizmo_demo gizmo_demo.c
@@ -39,7 +40,8 @@ add_executable(scene_editor
         scene_editor.c
         scene_editor.h
         rtt.c
-        rtt.h)
+        rtt.h
+        ui.c)
 target_compile_options(scene_editor PRIVATE -fblocks)
 target_include_directories(scene_editor PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
 target_link_libraries(scene_editor PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime)
@@ -57,3 +59,15 @@ add_executable(rtt_demo
 target_compile_options(rtt_demo PRIVATE -fblocks)
 target_include_directories(rtt_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
 target_link_libraries(rtt_demo PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime)
+
+## ui_demo
+add_executable(ui_demo
+        ui_demo.c
+)
+
+target_compile_options(ui_demo PRIVATE -fblocks)
+target_include_directories(ui_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS} ${JSON_C_INCLUDE_DIRS})
+target_link_libraries(ui_demo PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime json-c)
+
+## interface demo
+add_executable(interface_demo interface_demo.c)
