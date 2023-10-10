@@ -9,7 +9,7 @@ pkg_check_modules(GLIB REQUIRED glib-2.0)
 
 ## dependencies
 add_subdirectory(extern/raylib)
-add_subdirectory(extern/cJSON)
+add_subdirectory(extern/json-c)
 
 ## gizmo_demo
 add_executable(gizmo_demo gizmo_demo.c
@@ -41,6 +41,7 @@ add_executable(scene_editor
         scene_editor.h
         rtt.c
         rtt.h
+        ui.h
         ui.c)
 target_compile_options(scene_editor PRIVATE -fblocks)
 target_include_directories(scene_editor PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
@@ -63,6 +64,8 @@ target_link_libraries(rtt_demo PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime)
 ## ui_demo
 add_executable(ui_demo
         ui_demo.c
+        ui.h
+        ui.c
 )
 
 target_compile_options(ui_demo PRIVATE -fblocks)
