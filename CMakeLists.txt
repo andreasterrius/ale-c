@@ -16,6 +16,7 @@ pkg_check_modules(PANGOCAIRO REQUIRED pangocairo)
 ## dependencies
 add_subdirectory(extern/raylib)
 add_subdirectory(extern/json-c)
+add_subdirectory(extern/xxHash/cmake_unofficial EXCLUDE_FROM_ALL)
 
 ## gizmo_demo
 add_executable(gizmo_demo gizmo_demo.c
@@ -81,6 +82,22 @@ target_include_directories(ui_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE
 target_link_libraries(ui_demo PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime json-c
         ${PANGO_LIBRARIES} ${CAIRO_LIBRARIES} ${PANGOCAIRO_LIBRARIES}
 )
+
+## text_renderer_demo
+add_executable(text_renderer
+        text_renderer_demo.c
+        text_renderer.h
+        text_renderer.c
+)
+
+target_compile_options(text_renderer PRIVATE -fblocks)
+target_include_directories(text_renderer PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS} ${JSON_C_INCLUDE_DIRS}
+        ${PANGO_INCLUDE_DIRS} ${CAIRO_INCLUDE_DIRS} ${PANGOCAIRO_INCLUDE_DIRS} xxHash::xxhash
+)
+target_link_libraries(text_renderer PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime json-c
+        ${PANGO_LIBRARIES} ${CAIRO_LIBRARIES} ${PANGOCAIRO_LIBRARIES} xxHash::xxhash
+)
+
 
 ## interface demo
 add_executable(interface_demo interface_demo.c)

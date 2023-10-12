@@ -37,8 +37,6 @@ int main() {
     pango_layout_set_wrap(layout, PANGO_WRAP_WORD);
     pango_layout_set_justify(layout, true);
 
-
-
     // Set the text and fonts
     pango_layout_set_text(layout, "test | 밥을 먹다 | ご飯を食べる", -1);
     PangoFontDescription *fontDesc = pango_font_description_new();

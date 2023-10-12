@@ -10,3 +10,6 @@
 [submodule "extern/pango"]
 	path = extern/pango
 	url = git@github.com:GNOME/pango.git
+[submodule "extern/xxHash"]
+	path = extern/xxHash
+	url = git@github.com:Cyan4973/xxHash.git
