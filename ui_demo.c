@@ -23,15 +23,21 @@ int main() {
 
     SetTargetFPS(60);
 
-    cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 800, 600);
-    cairo_t *cr = cairo_create(surface);
-    PangoLayout *layout = pango_cairo_create_layout(cr);
-    PangoContext *context = pango_layout_get_context(layout);
+    PangoContext *context;
+    context = pango_font_map_create_context(pango_cairo_font_map_get_default());
+
+    PangoLayout *layout;
+    layout = pango_layout_new(context);
+
+    //PangoLayout *layout = pango_cairo_create_layout(context);
+    //PangoContext *context = pango_layout_get_context(layout);
     pango_context_set_base_dir(context, PANGO_DIRECTION_LTR); // Set text direction as needed
     int wrapWidth = 200; // Adjust this width as needed
     pango_layout_set_width(layout, wrapWidth * PANGO_SCALE);
     pango_layout_set_wrap(layout, PANGO_WRAP_WORD);
     pango_layout_set_justify(layout, true);
+
+
 
     // Set the text and fonts
     pango_layout_set_text(layout, "test | 밥을 먹다 | ご飯を食べる", -1);
@@ -41,14 +47,22 @@ int main() {
     pango_layout_set_font_description(layout, fontDesc);
     pango_font_description_free(fontDesc);
 
+    int textWidth, textHeight;
+    pango_layout_get_pixel_size(layout, &textWidth, &textHeight);
+
+    printf("PEW: %d %d", textWidth, textHeight);
+
+    cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, textWidth, textHeight);
+    cairo_t *cr = cairo_create(surface);
+
     cairo_set_source_rgb(cr, 0, 0, 0);
     pango_cairo_show_layout(cr, layout);
 
     cairo_image_surface_get_data(surface);
     Image image = { 0 };
     image.data = cairo_image_surface_get_data(surface);
-    image.width = 800;
-    image.height = 600;
+    image.width = textWidth;
+    image.height = textHeight;
     image.mipmaps = 1;
     image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8; // Adjust the format as needed
 
@@ -85,7 +99,7 @@ int main() {
     Font fontEastern = LoadFont("resources/font/NotoSansCJKjp-VF.ttf");
     defer{ UnloadFont(fontEastern); };
 
-    Rectangle panel = (Rectangle) {.x=200, .y=200, .width=400, .height=200};
+    Rectangle panel = (Rectangle) {.x=0, .y=0, .width=textWidth, .height=textHeight};
 
     while (!WindowShouldClose()) {
         BeginDrawing();
