@@ -3,9 +3,15 @@ project(hello_c C)
 
 set(CMAKE_C_STANDARD 23)
 
-## glib
+set(CMAKE_PREFIX_PATH "/usr/local")
+# manually install these
+## GLIB
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
+## pango
+pkg_check_modules(PANGO REQUIRED pango)
+pkg_check_modules(CAIRO REQUIRED cairo)
+pkg_check_modules(PANGOCAIRO REQUIRED pangocairo)
 
 ## dependencies
 add_subdirectory(extern/raylib)
@@ -69,8 +75,12 @@ add_executable(ui_demo
 )
 
 target_compile_options(ui_demo PRIVATE -fblocks)
-target_include_directories(ui_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS} ${JSON_C_INCLUDE_DIRS})
-target_link_libraries(ui_demo PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime json-c)
+target_include_directories(ui_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS} ${JSON_C_INCLUDE_DIRS}
+        ${PANGO_INCLUDE_DIRS} ${CAIRO_INCLUDE_DIRS} ${PANGOCAIRO_INCLUDE_DIRS}
+)
+target_link_libraries(ui_demo PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime json-c
+        ${PANGO_LIBRARIES} ${CAIRO_LIBRARIES} ${PANGOCAIRO_LIBRARIES}
+)
 
 ## interface demo
 add_executable(interface_demo interface_demo.c)

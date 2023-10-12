@@ -7,3 +7,6 @@
 [submodule "extern/json-c"]
 	path = extern/json-c
 	url = git@github.com:json-c/json-c.git
+[submodule "extern/pango"]
+	path = extern/pango
+	url = git@github.com:GNOME/pango.git
