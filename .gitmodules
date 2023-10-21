@@ -1,15 +1,9 @@
-[submodule "extern/glib"]
-	path = extern/glib
-	url = git@github.com:GNOME/glib.git
 [submodule "extern/raylib"]
 	path = extern/raylib
 	url = git@github.com:raysan5/raylib.git
 [submodule "extern/json-c"]
 	path = extern/json-c
 	url = git@github.com:json-c/json-c.git
-[submodule "extern/pango"]
-	path = extern/pango
-	url = git@github.com:GNOME/pango.git
 [submodule "extern/xxHash"]
 	path = extern/xxHash
 	url = git@github.com:Cyan4973/xxHash.git
