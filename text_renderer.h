@@ -5,10 +5,8 @@
 #ifndef HELLO_C_TEXT_RENDERER_H
 #define HELLO_C_TEXT_RENDERER_H
 
-#include<pango/pango.h>
-#include<pango/pangocairo.h>
 #include<raylib.h>
-#include<glib.h>
+#include<extern/klib/>
 
 typedef struct AlTextRenderer {
     PangoFontMap *fontMap;

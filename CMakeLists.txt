@@ -3,20 +3,12 @@ project(hello_c C)
 
 set(CMAKE_C_STANDARD 23)
 
-set(CMAKE_PREFIX_PATH "/usr/local")
-# manually install these
-## GLIB
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GLIB REQUIRED glib-2.0)
-## pango
-pkg_check_modules(PANGO REQUIRED pango)
-pkg_check_modules(CAIRO REQUIRED cairo)
-pkg_check_modules(PANGOCAIRO REQUIRED pangocairo)
-
 ## dependencies
 add_subdirectory(extern/raylib)
 add_subdirectory(extern/json-c)
 add_subdirectory(extern/xxHash/cmake_unofficial EXCLUDE_FROM_ALL)
+add_subdirectory(extern/blocksruntime)
+add_subdirectory(extern/klib)
 
 ## gizmo_demo
 add_executable(gizmo_demo gizmo_demo.c
@@ -24,16 +16,16 @@ add_executable(gizmo_demo gizmo_demo.c
         gizmo.c
         object.c
         object.h)
-target_include_directories(gizmo_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
-target_link_libraries(gizmo_demo PRIVATE ${GLIB_LIBRARIES} raylib)
+target_include_directories(gizmo_demo PRIVATE ${RAYLIB_INCLUDE_DIRS})
+target_link_libraries(gizmo_demo PRIVATE raylib)
 
 ## arc_camera
 add_executable(arc_camera_demo
         arc_camera.h
         arc_camera.c
         arc_camera_demo.c)
-target_include_directories(arc_camera_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
-target_link_libraries(arc_camera_demo PRIVATE ${GLIB_LIBRARIES} raylib)
+target_include_directories(arc_camera_demo PRIVATE ${RAYLIB_INCLUDE_DIRS})
+target_link_libraries(arc_camera_demo PRIVATE raylib)
 
 ## scene_editor
 add_executable(scene_editor
@@ -49,10 +41,11 @@ add_executable(scene_editor
         rtt.c
         rtt.h
         ui.h
-        ui.c)
+        ui.c
+)
 target_compile_options(scene_editor PRIVATE -fblocks)
-target_include_directories(scene_editor PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
-target_link_libraries(scene_editor PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime)
+target_include_directories(scene_editor PRIVATE ${RAYLIB_INCLUDE_DIRS})
+target_link_libraries(scene_editor PRIVATE raylib BlocksRuntime klib)
 
 ## viewport_demo
 add_executable(rtt_demo
@@ -65,8 +58,8 @@ add_executable(rtt_demo
 )
 
 target_compile_options(rtt_demo PRIVATE -fblocks)
-target_include_directories(rtt_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS})
-target_link_libraries(rtt_demo PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime)
+target_include_directories(rtt_demo PRIVATE ${RAYLIB_INCLUDE_DIRS})
+target_link_libraries(rtt_demo PRIVATE raylib BlocksRuntime)
 
 ## ui_demo
 add_executable(ui_demo
@@ -76,27 +69,18 @@ add_executable(ui_demo
 )
 
 target_compile_options(ui_demo PRIVATE -fblocks)
-target_include_directories(ui_demo PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS} ${JSON_C_INCLUDE_DIRS}
-        ${PANGO_INCLUDE_DIRS} ${CAIRO_INCLUDE_DIRS} ${PANGOCAIRO_INCLUDE_DIRS}
-)
-target_link_libraries(ui_demo PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime json-c
-        ${PANGO_LIBRARIES} ${CAIRO_LIBRARIES} ${PANGOCAIRO_LIBRARIES}
-)
+target_include_directories(ui_demo PRIVATE ${RAYLIB_INCLUDE_DIRS} ${JSON_C_INCLUDE_DIRS})
+target_link_libraries(ui_demo PRIVATE raylib BlocksRuntime json-c)
 
 ## text_renderer_demo
 add_executable(text_renderer
         text_renderer_demo.c
         text_renderer.h
-        text_renderer.c
-)
+        text_renderer.c)
 
 target_compile_options(text_renderer PRIVATE -fblocks)
-target_include_directories(text_renderer PRIVATE ${GLIB_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIRS} ${JSON_C_INCLUDE_DIRS}
-        ${PANGO_INCLUDE_DIRS} ${CAIRO_INCLUDE_DIRS} ${PANGOCAIRO_INCLUDE_DIRS} xxHash::xxhash
-)
-target_link_libraries(text_renderer PRIVATE ${GLIB_LIBRARIES} raylib BlocksRuntime json-c
-        ${PANGO_LIBRARIES} ${CAIRO_LIBRARIES} ${PANGOCAIRO_LIBRARIES} xxHash::xxhash
-)
+target_include_directories(text_renderer PRIVATE ${RAYLIB_INCLUDE_DIRS} ${JSON_C_INCLUDE_DIRS} xxHash::xxhash)
+target_link_libraries(text_renderer PRIVATE raylib BlocksRuntime json-c xxHash::xxhash)
 
 
 ## interface demo

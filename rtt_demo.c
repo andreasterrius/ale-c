@@ -3,7 +3,7 @@
 //
 #include<raylib.h>
 #include<raymath.h>
-#include <stdio.h>
+#include<stdio.h>
 #include"rtt.h"
 #include"arc_camera.h"
 #include"defer.h"

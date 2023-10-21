@@ -8,7 +8,7 @@
 
 void alSceneEditorInit(AlSceneEditor *self, Camera3D camera, Vector2 *windowSize) {
     self->selectedObject = NULL;
-    self->objects = g_array_new(false, false, sizeof(AlObject));
+    kv_init(self->objects);
     self->camera = camera;
     alGizmoInit(&self->gizmo);
     alRttInit(&self->gizmoViewport, NULL);
@@ -45,17 +45,13 @@ void alSceneEditorHandleInput(AlSceneEditor *self) {
 void alSceneEditorDeinit(AlSceneEditor *self) {
     alGizmoDeinit(&self->gizmo);
     alRttDeinit(&self->gizmoViewport);
-    for (int i = 0; i < self->objects->len; ++i) {
-        AlObject obj = g_array_index(self->objects, AlObject, i);
-        alObjectDeinit(&obj);
-    }
-    g_array_free(self->objects, true);
+    kv_destroy(self->objects);
 }
 
 bool alSceneEditorSelectObject(AlSceneEditor *self) {
     Ray ray = GetMouseRay(GetMousePosition(), self->camera);
-    for (int i = 0; i < self->objects->len; ++i) {
-        AlObject *obj = &g_array_index(self->objects, AlObject, i);
+    for (int i = 0; i < kv_size(self->objects); ++i) {
+        AlObject *obj = &kv_A(self->objects, i);
         for (int j = 0; j < obj->model.meshCount; ++j) {
             RayCollision rayCollision = GetRayCollisionMesh(ray, obj->model.meshes[j], obj->model.transform);
             if (rayCollision.hit) {
@@ -98,8 +94,8 @@ void alSceneEditorRender(const AlSceneEditor *self) {
         {
             BeginMode3D(self->camera);
             defer{ EndMode3D(); };
-            for (int i = 0; i < self->objects->len; ++i) {
-                AlObject obj = g_array_index(self->objects, AlObject, i);
+            for (int i = 0; i < kv_size(self->objects); ++i) {
+                AlObject obj = kv_A(self->objects, i);
                 DrawModel(obj.model, Vector3Zero(), 1.0f, WHITE);
             }
             DrawGrid(10, 1.0f);

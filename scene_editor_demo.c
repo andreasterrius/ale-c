@@ -41,8 +41,9 @@ int main(int argc, char **argv) {
 //    anotherObject.model = LoadModelFromMesh(GenMeshSphere(2.0f, 16, 16));
 
     // let's add this manually for now
-    g_array_append_val(sceneEditor.objects, object);
-//    g_array_append_val(sceneEditor.objects, anotherObject);
+    //g_array_append_val(sceneEditor.objects, object);
+    kv_push(AlObject, sceneEditor.objects, object);
+    //    g_array_append_val(sceneEditor.objects, anotherObject);
 
     while (!WindowShouldClose()) {
 
