@@ -32,16 +32,17 @@ int main(int argc, char **argv) {
     };
     object.model = LoadModelFromMesh(GenMeshCube(2.0f, 1.0f, 1.0f));
 
-//    AlObject anotherObject;
-//    anotherObject.transform = (Transform) {
-//            .translation = (Vector3) {.x=3, .y=3, .z=3},
-//            .scale = Vector3One(),
-//            .rotation = QuaternionIdentity()
-//    };
-//    anotherObject.model = LoadModelFromMesh(GenMeshSphere(2.0f, 16, 16));
+    AlObject anotherObject;
+    anotherObject.transform = (Transform) {
+            .translation = (Vector3) {.x=3, .y=3, .z=3},
+            .scale = Vector3One(),
+            .rotation = QuaternionIdentity()
+    };
+    anotherObject.model = LoadModelFromMesh(GenMeshSphere(2.0f, 16, 16));
 
     // let's add this manually for now
     //g_array_append_val(sceneEditor.objects, object);
+    kv_push(AlObject, sceneEditor.objects, object);
     kv_push(AlObject, sceneEditor.objects, object);
     //    g_array_append_val(sceneEditor.objects, anotherObject);
 

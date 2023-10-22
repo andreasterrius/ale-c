@@ -74,13 +74,13 @@ target_link_libraries(ui_demo PRIVATE raylib BlocksRuntime json-c)
 
 ## text_renderer_demo
 add_executable(text_renderer
-        text_renderer_demo.c
-        text_renderer.h
-        text_renderer.c)
+        unicode_font_demo.c
+        unicode_font.h
+        unicode_font.c)
 
 target_compile_options(text_renderer PRIVATE -fblocks)
 target_include_directories(text_renderer PRIVATE ${RAYLIB_INCLUDE_DIRS} ${JSON_C_INCLUDE_DIRS} xxHash::xxhash)
-target_link_libraries(text_renderer PRIVATE raylib BlocksRuntime json-c xxHash::xxhash)
+target_link_libraries(text_renderer PRIVATE raylib BlocksRuntime json-c xxHash::xxhash klib)
 
 
 ## interface demo

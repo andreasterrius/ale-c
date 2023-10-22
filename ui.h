@@ -14,11 +14,3 @@ typedef struct AlUiPanel {
 typedef struct AlUiItem {
 
 } AlUiItem ;
-
-// Copied directly from Raylib Example
-// Draw text using font inside rectangle limits
-void DrawTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
-
-// Copied directly from Raylib Example
-// Draw text using font inside rectangle limits with support for text selection
-void DrawTextBoxedSelectable(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint);
