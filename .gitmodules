@@ -7,9 +7,6 @@
 [submodule "extern/xxHash"]
 	path = extern/xxHash
 	url = git@github.com:Cyan4973/xxHash.git
-[submodule "extern/klib"]
-	path = extern/klib
-	url = git@github.com:attractivechaos/klib.git
 [submodule "extern/blocksruntime"]
 	path = extern/blocksruntime
 	url = git@github.com:mackyle/blocksruntime.git
