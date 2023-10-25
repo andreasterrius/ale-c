@@ -12,11 +12,10 @@
 
 KHASH_MAP_INIT_INT(fontCache, Font*)
 
-
 typedef struct AlUnicodeFont {
     khash_t(fontCache) *codepointToFontMap;
     kvec_t(Font*) fonts; //owning pointer for font
-    Font baseFont;
+    Font* baseFont;
 } AlUnicodeFont;
 
 typedef struct AlTextRendererFontRange {
@@ -39,6 +38,6 @@ void alUnicodeFontRenderBoxed(AlUnicodeFont *self, const char *text, Rectangle r
 void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap,
                                    Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint);
 
-void alUnciodeFontDeinit(AlUnicodeFont *self);
+void alUnicodeFontDeinit(AlUnicodeFont *self);
 
 #endif //HELLO_C_UNICODE_FONT_H

@@ -5,21 +5,24 @@
 #include "unicode_font.h"
 #include "defer.h"
 #include<xxhash.h>
+#include <stdio.h>
 
-
-void alUnicodeFontRenderBoxed(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint){
+void alUnicodeFontRenderBoxed(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing,
+                              bool wordWrap, Color tint) {
     alUnicodeFontRenderSelectable(self, text, rec, fontSize, spacing, wordWrap, tint, 0, 0, WHITE, WHITE);
 }
 
 // Copied directly from raylib example
-void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap,
-                                   Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint) {
+void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing,
+                                   bool wordWrap,
+                                   Color tint, int selectStart, int selectLength, Color selectTint,
+                                   Color selectBackTint) {
     int length = TextLength(text);  // Total length in bytes of the text, scanned by codepoints in loop
 
     float textOffsetY = 0.0f;       // Offset between lines (on line break '\n')
     float textOffsetX = 0.0f;       // Offset X to next character to draw
 
-    float scaleFactor = fontSize / (float) self->baseFont.baseSize;     // Character rectangle scaling factor
+    float scaleFactor = fontSize / (float) self->baseFont->baseSize;     // Character rectangle scaling factor
 
     // Word/character wrapping mechanism variables
     enum {
@@ -39,12 +42,12 @@ void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectan
 
         Font *font;
         int index;
-        if(iter == kh_end(self->codepointToFontMap)){
+        if (iter != kh_end(self->codepointToFontMap)) {
             font = kh_val(self->codepointToFontMap, iter);
             index = GetGlyphIndex(*font, codepoint);
         } else {
             index = 0x3f; // '?'
-            font = &self->baseFont;
+            font = self->baseFont;
         }
 
         // NOTE: Normally we exit the decoding sequence as soon as a bad byte is found (and return 0x3f)
@@ -147,55 +150,56 @@ bool alUnicodeFontInit(AlUnicodeFont *self,
     unsigned char *fileData = LoadFileData(filePath, &fileSize);
     char *fileExt = GetFileExtension(filePath);
 
-    i32 maxTextureSize = 8192;
-    i32 glyphCountPerTexture = (8192 / fontSize) + 1;
+    self->codepointToFontMap = kh_init(fontCache);
+    kv_init(self->fonts);
+
+    // i32 maxTextureSize = 8192;
+    i32 glyphCountPerTexture = 1000;
 
     for (int i = 0; i < kv_size(*ranges); ++i) {
         AlUnicodeFontRange range = kv_A(*ranges, i);
-        kvec_t(int) codePointToLoad;
-        kv_init(codePointToLoad);
-        defer{ kv_destroy(codePointToLoad); };
 
-        int count = 0;
-        Font *font = (Font *) malloc(sizeof(Font));
+        for (i32 j = range.start; j <= range.end; j += glyphCountPerTexture) {
 
-        for (i32 j = range.start; j < range.end; j += 1) {
-            i32 ret;
-            i32 k = kh_put(fontCache, self->codepointToFontMap, j, &ret);
-            kh_value(self->codepointToFontMap, k) = font;
+            kvec_t(int) codePointToLoad;
+            kv_init(codePointToLoad);
+            defer{ kv_destroy(codePointToLoad); };
 
-            // load the glyphs
-            // - when its too much for one font atlas or
-            // - when this is last codepoint and haven't created the font atlas yet
-            if (count > glyphCountPerTexture || (j == range.end - 1 && count != 0)) {
-                Font tempFont = LoadFontFromMemory(fileExt, fileData, fileSize, fontSize, codePointToLoad.a, count);
-                *font = tempFont;
-                kv_push(Font*, self->fonts, font);
+            i32 start = j;
+            i32 end = j + glyphCountPerTexture < range.end ? j + glyphCountPerTexture : range.end;
 
-                //reset all
-                count = 0;
-                kv_destroy(codePointToLoad);
-                kv_init(codePointToLoad);
+            if (end < start)
+                break;
 
-                // save this for default fallback
-                self->baseFont = tempFont;
+            Font *font = (Font *) malloc(sizeof(Font));
+
+            // for every unicode codepoint
+            i32 c = 0;
+            for (int k = start; k <= end; ++k) {
+                i32 ret;
+                i32 k = kh_put(fontCache, self->codepointToFontMap, j, &ret);
+                kh_value(self->codepointToFontMap, k) = font;
+                c++;
             }
+            Font tempFont = LoadFontFromMemory(fileExt, fileData, fileSize, fontSize, codePointToLoad.a,c);
+            defer{ UnloadFont(tempFont); };
+            *font = tempFont;
+            kv_push(Font*, self->fonts, font);
+
+            // save this for default fallback
+            self->baseFont = font;
         }
     }
 
-    // nothing is loaded
-    if(kv_size(self->fonts) == 0) {
-        // log error here
-        return false;
-    }
 
     return true;
 }
 
-void alUnciodeFontDeinit(AlUnicodeFont *self) {
+void alUnicodeFontDeinit(AlUnicodeFont *self) {
     kh_destroy(fontCache, self->codepointToFontMap);
-    for (int i = 0; i < kv_size(self->fonts); ++i) {
-        free(kv_A(self->fonts, i));
+    int s = kv_size(self->fonts);
+    for (int i = 0; i < s; ++i) {
+        free(self->fonts.a[i]);
     }
     kv_destroy(self->fonts);
 }

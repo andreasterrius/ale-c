@@ -9,6 +9,10 @@ add_subdirectory(extern/json-c)
 add_subdirectory(extern/xxHash/cmake_unofficial EXCLUDE_FROM_ALL)
 add_subdirectory(extern/blocksruntime)
 add_subdirectory(extern/klib)
+add_subdirectory(extern/googletest)
+
+## googletest
+
 
 ## gizmo_demo
 add_executable(gizmo_demo gizmo_demo.c
