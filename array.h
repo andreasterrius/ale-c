@@ -10,46 +10,22 @@
 #include <string.h>
 
 typedef struct AlArray {
-    i32 size;
-    i32 capacity;
-    i32 elementSize;
-    void **data;
+    usize size;
+    usize capacity;
+    usize elementSize; //sizeof(T)
+    void *data;
 } AlArray;
 
-bool alArrayInit(AlArray *self, i32 elementSize, i32 initialCapacity) {
-    self->size = 0;
-    self->elementSize = elementSize;
-    self->capacity = initialCapacity;
-    self->data = malloc(initialCapacity * elementSize);
-    if (self->data == NULL) {
-        return false;
-    }
-    return true;
-}
+bool alArrayInit(AlArray *self, usize elementSize, usize initialCapacity);
 
-bool alArrayPush(AlArray *self, void *data) {
-    if (self->size >= self->capacity) {
-        self->capacity *= 2;
-        self->data = realloc(self->data, self->capacity * self->elementSize);
-        if (self->data == NULL) {
-            return false;
-        }
-    }
+bool alArrayPush(AlArray *self, void *data);
 
-    char *dest = (char *)self->data + (self->size * self->elementSize);
-    memcpy(dest, data, self->elementSize);
-    self->size += 1;
-    return true;
-}
+bool alArrayPop(AlArray *self);
 
-void alArrayDeinit(AlArray *self, bool freeContents) {
-    if (freeContents) {
-        for (int i = 0; i < self->size; ++i) {
-            free(self->data[i]);
-        }
-    }
-    if (self->data)
-        free(self->data);
-}
+void* alArrayGet(AlArray self, usize index);
+
+i32 alArraySize(AlArray self);
+
+void alArrayDeinit(AlArray *self);
 
 #endif //HELLO_C_ARRAY_H

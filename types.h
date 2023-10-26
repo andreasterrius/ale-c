@@ -6,8 +6,11 @@
 #define HELLO_C_TYPES_H
 
 #include<stdint.h>
+#include<stdbool.h>
 
 typedef int32_t i32;
 typedef uint32_t u32;
+typedef size_t usize;
+typedef ssize_t isize;
 
 #endif //HELLO_C_TYPES_H

@@ -6,11 +6,7 @@
 #define HELLO_C_UNICODE_FONT_H
 
 #include<raylib.h>
-#include"extern/klib/kvec.h"
-#include"extern/klib/khash.h"
 #include"types.h"
-
-KHASH_MAP_INIT_INT(fontCache, Font*)
 
 typedef struct AlUnicodeFont {
     khash_t(fontCache) *codepointToFontMap;

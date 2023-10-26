@@ -9,6 +9,23 @@ add_subdirectory(extern/json-c)
 add_subdirectory(extern/xxHash/cmake_unofficial EXCLUDE_FROM_ALL)
 add_subdirectory(extern/blocksruntime)
 
+enable_testing()
+
+## array_test
+add_executable(array_test array_test.c array.c array.h)
+target_compile_options(array_test PRIVATE -fblocks)
+target_link_libraries(array_test PRIVATE BlocksRuntime)
+add_test(NAME test_array_struct COMMAND array_test "testArrayStruct")
+add_test(NAME test_array_primitive COMMAND array_test "testArrayPrimitive")
+
+## hashmap
+add_executable(hashmap_test hashmap_test.c hashmap.c hashmap.h)
+target_compile_options(hashmap_test PRIVATE -fblocks)
+target_include_directories(hashmap_test PRIVATE xxHash::xxhash)
+target_link_libraries(hashmap_test PRIVATE BlocksRuntime xxHash::xxhash)
+add_test(NAME test_hashmap_struct COMMAND hashmap_test "testHashMapStruct")
+add_test(NAME test_hashmap_primitive COMMAND hashmap_test "testHashMapPrimitive")
+
 ## gizmo_demo
 add_executable(gizmo_demo gizmo_demo.c
         gizmo.h
@@ -44,7 +61,7 @@ add_executable(scene_editor
 )
 target_compile_options(scene_editor PRIVATE -fblocks)
 target_include_directories(scene_editor PRIVATE ${RAYLIB_INCLUDE_DIRS})
-target_link_libraries(scene_editor PRIVATE raylib BlocksRuntime klib)
+target_link_libraries(scene_editor PRIVATE raylib BlocksRuntime)
 
 ## viewport_demo
 add_executable(rtt_demo
@@ -79,7 +96,7 @@ add_executable(text_renderer
 
 target_compile_options(text_renderer PRIVATE -fblocks)
 target_include_directories(text_renderer PRIVATE ${RAYLIB_INCLUDE_DIRS} ${JSON_C_INCLUDE_DIRS} xxHash::xxhash)
-target_link_libraries(text_renderer PRIVATE raylib BlocksRuntime json-c xxHash::xxhash klib)
+target_link_libraries(text_renderer PRIVATE raylib BlocksRuntime json-c xxHash::xxhash)
 
 
 ## interface demo

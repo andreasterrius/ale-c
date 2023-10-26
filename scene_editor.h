@@ -5,7 +5,6 @@
 #ifndef HELLO_C_SCENE_EDITOR_H
 #define HELLO_C_SCENE_EDITOR_H
 
-#include"extern/klib/kvec.h"
 #include"gizmo.h"
 #include"object.h"
 #include"arc_camera.h"
