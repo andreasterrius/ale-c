@@ -25,6 +25,7 @@ target_include_directories(hashmap_test PRIVATE xxHash::xxhash)
 target_link_libraries(hashmap_test PRIVATE BlocksRuntime xxHash::xxhash)
 add_test(NAME test_hashmap_struct COMMAND hashmap_test "testHashMapStruct")
 add_test(NAME test_hashmap_primitive COMMAND hashmap_test "testHashMapPrimitive")
+add_test(NAME test_hashmap_grow COMMAND hashmap_test "testHashMapGrow")
 
 ## gizmo_demo
 add_executable(gizmo_demo gizmo_demo.c

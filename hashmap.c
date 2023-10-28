@@ -7,6 +7,7 @@
 void alHashMapInit(AlHashMap* map, usize elementSize, usize capacity){
     map->tableSize = capacity + INITIAL_TABLE_SIZE;
     map->size = 0;
+    map->elementSize = sizeof(struct AlKeyValuePair);
     map->table = (struct AlKeyValuePair*)malloc(map->tableSize * sizeof(struct AlKeyValuePair));
     for (int i = 0; i < map->tableSize; i++) {
         map->table[i].key = NULL;
@@ -33,6 +34,7 @@ void alHashMapGrow(AlHashMap *map) {
     free(old_table);
 }
 
+//TODO: This needs to be a boolean in case of malloc failure
 void alHashMapInsert(AlHashMap* map, char* key, void* value) {
     if ((double)map->size / map->tableSize > LOAD_FACTOR) {
         alHashMapGrow(map);
