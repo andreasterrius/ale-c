@@ -7,25 +7,23 @@
 
 #include<raylib.h>
 #include"types.h"
+#include"array.h"
+#include"hashmap.h"
 
 typedef struct AlUnicodeFont {
-    khash_t(fontCache) *codepointToFontMap;
-    kvec_t(Font*) fonts; //owning pointer for font
-    Font* baseFont;
+    AlArray fonts; // AlArray<Font*>, owning
+    AlHashMap codepointToFontMap; // AlHashMap<char*, Font**>
 } AlUnicodeFont;
 
-typedef struct AlTextRendererFontRange {
+typedef struct AlUnicodeFontRange {
     i32 start;
     i32 end;
 } AlUnicodeFontRange;
 
-typedef kvec_t(AlUnicodeFontRange) AlTextRendererFontRangeVec;
-
 bool alUnicodeFontInit(AlUnicodeFont *self,
                        const char *filePath,
                        i32 fontSize,
-                       AlTextRendererFontRangeVec *ranges);
-
+                       AlArray ranges /*AlArray<AlUnicodeFontRange> */);
 
 void alUnicodeFontRender(AlUnicodeFont *self, const char *text, float fontSize);
 

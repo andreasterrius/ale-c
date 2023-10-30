@@ -8,11 +8,12 @@
 #include"gizmo.h"
 #include"object.h"
 #include"arc_camera.h"
+#include"array.h"
 #include"rtt.h"
 
 typedef struct AlSceneEditor {
     // all objects currently in the scene
-    kvec_t(AlObject) objects;
+    AlArray objects; //AlAray<AlObject>
     Camera3D camera;
 
     // currently selected object

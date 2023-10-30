@@ -59,6 +59,8 @@ add_executable(scene_editor
         rtt.h
         ui.h
         ui.c
+        array.h
+        array.c
 )
 target_compile_options(scene_editor PRIVATE -fblocks)
 target_include_directories(scene_editor PRIVATE ${RAYLIB_INCLUDE_DIRS})
@@ -91,6 +93,10 @@ target_link_libraries(ui_demo PRIVATE raylib BlocksRuntime json-c)
 
 ## text_renderer_demo
 add_executable(text_renderer
+        array.h
+        array.c
+        hashmap.h
+        hashmap.c
         unicode_font_demo.c
         unicode_font.h
         unicode_font.c)

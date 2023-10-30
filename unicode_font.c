@@ -6,6 +6,15 @@
 #include "defer.h"
 #include<xxhash.h>
 #include <stdio.h>
+#include<math.h>
+
+i32 min(i32 a, i32 b) {
+    if (a <= b) {
+        return a;
+    } else {
+        return b;
+    }
+}
 
 void alUnicodeFontRenderBoxed(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing,
                               bool wordWrap, Color tint) {
@@ -17,12 +26,18 @@ void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectan
                                    bool wordWrap,
                                    Color tint, int selectStart, int selectLength, Color selectTint,
                                    Color selectBackTint) {
+    if (alArraySize(self->fonts) == 0) {
+        // no loaded font
+        return;
+    }
+    Font *baseFont = (Font *) alArrayGet(self->fonts, 0);
+
     int length = TextLength(text);  // Total length in bytes of the text, scanned by codepoints in loop
 
     float textOffsetY = 0.0f;       // Offset between lines (on line break '\n')
     float textOffsetX = 0.0f;       // Offset X to next character to draw
 
-    float scaleFactor = fontSize / (float) self->baseFont->baseSize;     // Character rectangle scaling factor
+    float scaleFactor = fontSize / (float) baseFont->baseSize;     // Character rectangle scaling factor
 
     // Word/character wrapping mechanism variables
     enum {
@@ -34,20 +49,24 @@ void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectan
     int endLine = -1;           // Index where to stop drawing (where a line ends)
     int lastk = -1;             // Holds last value of the character position
 
+
     for (int i = 0, k = 0; i < length; i++, k++) {
         // Get next codepoint from byte string and glyph index in font
         int codepointByteCount = 0;
         int codepoint = GetCodepoint(&text[i], &codepointByteCount);
-        khiter_t iter = kh_get(fontCache, self->codepointToFontMap, codepoint);
+
+        char buffer[12];
+        sprintf(buffer, "%d", codepoint);
+        Font **fontPtr = (Font **) alHashMapGet(self->codepointToFontMap, buffer);
 
         Font *font;
         int index;
-        if (iter != kh_end(self->codepointToFontMap)) {
-            font = kh_val(self->codepointToFontMap, iter);
-            index = GetGlyphIndex(*font, codepoint);
-        } else {
+        if (fontPtr == NULL) {
             index = 0x3f; // '?'
-            font = self->baseFont;
+            font = baseFont;
+        } else {
+            font = *fontPtr;
+            index = GetGlyphIndex(*font, codepoint);
         }
 
         // NOTE: Normally we exit the decoding sequence as soon as a bad byte is found (and return 0x3f)
@@ -91,8 +110,8 @@ void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectan
 
                 // Save character position when we switch states
                 int tmp = lastk;
-                lastk = iter - 1;
-                iter = tmp;
+                lastk = k - 1;
+                k = tmp;
             }
         } else {
             if (codepoint == '\n') {
@@ -111,7 +130,7 @@ void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectan
 
                 // Draw selection background
                 bool isGlyphSelected = false;
-                if ((selectStart >= 0) && (iter >= selectStart) && (iter < (selectStart + selectLength))) {
+                if ((selectStart >= 0) && (k >= selectStart) && (k < (selectStart + selectLength))) {
                     DrawRectangleRec((Rectangle) {rec.x + textOffsetX - 1, rec.y + textOffsetY, glyphWidth,
                                                   (float) font->baseSize * scaleFactor}, selectBackTint);
                     isGlyphSelected = true;
@@ -130,8 +149,8 @@ void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectan
                 startLine = endLine;
                 endLine = -1;
                 glyphWidth = 0;
-                selectStart += lastk - iter;
-                iter = lastk;
+                selectStart += lastk - k;
+                k = lastk;
 
                 state = !state;
             }
@@ -144,62 +163,84 @@ void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectan
 bool alUnicodeFontInit(AlUnicodeFont *self,
                        const char *filePath,
                        i32 fontSize,
-                       AlTextRendererFontRangeVec *ranges) {
+                       AlArray ranges) {
     // Loading file to memory
     u32 fileSize = 0;
     unsigned char *fileData = LoadFileData(filePath, &fileSize);
+    defer { UnloadFileData(fileData); };
     char *fileExt = GetFileExtension(filePath);
 
-    self->codepointToFontMap = kh_init(fontCache);
-    kv_init(self->fonts);
-
-    // i32 maxTextureSize = 8192;
     i32 glyphCountPerTexture = 1000;
+    i32 fontCount = 0;
+    i32 totalGlyphCount = 0;
+    for (int i = 0; i < alArraySize(ranges); ++i) {
+        AlUnicodeFontRange *r = alArrayGet(ranges, i);
+        i32 glyphCount = r->end - r->start + 1;
+        if(glyphCount <= 0) continue;
+        fontCount += glyphCount / glyphCountPerTexture;
+        if ((glyphCount % glyphCountPerTexture) > 0) fontCount += 1;
+        totalGlyphCount += glyphCount;
+    }
 
-    for (int i = 0; i < kv_size(*ranges); ++i) {
-        AlUnicodeFontRange range = kv_A(*ranges, i);
+    alArrayInit(&self->fonts, sizeof(Font), fontCount);
+    alHashMapInit(&self->codepointToFontMap, totalGlyphCount + (totalGlyphCount / 10 /*10% buffer just in case*/));
 
-        for (i32 j = range.start; j <= range.end; j += glyphCountPerTexture) {
+    int total = 0;
+    for (int i = 0; i < alArraySize(ranges); ++i) {
+        AlUnicodeFontRange *range = (AlUnicodeFontRange *) alArrayGet(ranges, i);
 
-            kvec_t(int) codePointToLoad;
-            kv_init(codePointToLoad);
-            defer{ kv_destroy(codePointToLoad); };
-
+        for (i32 j = range->start; j <= range->end; j += glyphCountPerTexture) {
             i32 start = j;
-            i32 end = j + glyphCountPerTexture < range.end ? j + glyphCountPerTexture : range.end;
+            i32 end = min(j + glyphCountPerTexture, range->end);
 
-            if (end < start)
-                break;
+            printf("start: %d, end:%d\n", start, end);
 
-            Font *font = (Font *) malloc(sizeof(Font));
+            // for every unicode codepoint, establish connection between glyph->texture
+            AlArray codepointToLoad;
+            alArrayInit(&codepointToLoad, sizeof(int), end - start + 1);
+            defer{ alArrayDeinit(&codepointToLoad); };
 
-            // for every unicode codepoint
             i32 c = 0;
-            for (int k = start; k <= end; ++k) {
-                i32 ret;
-                i32 k = kh_put(fontCache, self->codepointToFontMap, j, &ret);
-                kh_value(self->codepointToFontMap, k) = font;
+            for (int k = start; k < end; ++k) {
+                alArrayPush(&codepointToLoad, &k);
                 c++;
             }
-            Font tempFont = LoadFontFromMemory(fileExt, fileData, fileSize, fontSize, codePointToLoad.a,c);
-            defer{ UnloadFont(tempFont); };
-            *font = tempFont;
-            kv_push(Font*, self->fonts, font);
 
-            // save this for default fallback
-            self->baseFont = font;
+            // now we actually load the texture into memory, attach it to Font*
+            Font font = LoadFontFromMemory(fileExt, fileData, fileSize, fontSize, codepointToLoad.data, c);
+            alArrayPush(&self->fonts, &font);
+            void *arrayFontPtr = alArrayGet(self->fonts, alArraySize(self->fonts) - 1);
+
+            for (int k = start; k < end; ++k) {
+                char buffer[12];
+                sprintf(buffer, "%d", k);
+                alHashMapInsert(&self->codepointToFontMap, buffer, &arrayFontPtr);
+            }
+            total += c;
         }
     }
 
+    for (int i = 0; i < alArraySize(self->fonts); ++i) {
+        Font *f = (Font *) alArrayGet(self->fonts, i);
+        printf("%d count: %d\n", i, f->glyphCount);
+    }
+    int codePointSize;
+    int codepoint = GetCodepoint("ご", &codePointSize);
+    char buffer[12];
+    sprintf(buffer, "%d", codepoint);
 
+    Font **bf = alHashMapGet(self->codepointToFontMap, buffer);
+    printf("HASHMAP BF count: %d\n", bf == NULL ? 0 : (*bf)->glyphCount);
+
+    fflush(stdout);
     return true;
 }
 
 void alUnicodeFontDeinit(AlUnicodeFont *self) {
-    kh_destroy(fontCache, self->codepointToFontMap);
-    int s = kv_size(self->fonts);
-    for (int i = 0; i < s; ++i) {
-        free(self->fonts.a[i]);
+    for (int i = 0; i < alArraySize(self->fonts); ++i) {
+        Font *f = (Font *) alArrayGet(self->fonts, i);
+        UnloadFont(*f);
     }
-    kv_destroy(self->fonts);
+    alArrayDeinit(&self->fonts);
+    alHashMapDeinit(&self->codepointToFontMap, true);
 }

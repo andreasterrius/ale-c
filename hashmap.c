@@ -4,7 +4,7 @@
 
 #include "hashmap.h"
 
-void alHashMapInit(AlHashMap* map, usize elementSize, usize capacity){
+void alHashMapInit(AlHashMap* map, usize capacity){
     map->tableSize = capacity + INITIAL_TABLE_SIZE;
     map->size = 0;
     map->elementSize = sizeof(struct AlKeyValuePair);
@@ -28,9 +28,9 @@ void alHashMapGrow(AlHashMap *map) {
         if (old_table[i].key != NULL) {
             alHashMapInsert(map, old_table[i].key, old_table[i].value);
             free(old_table[i].key);
+            //free(old_table[i].value);
         }
     }
-
     free(old_table);
 }
 
@@ -72,6 +72,18 @@ void* alHashMapGet(AlHashMap map, char* key){
         }
     }
     return NULL;
+}
+
+void alHashMapDeinit(AlHashMap *map, bool freeContents) {
+    if(freeContents) {
+        for (int i = 0; i < map->size; ++i) {
+            if(map->table[i].key != NULL) {
+                free(map->table[i].key);
+                free(map->table[i].value);
+            }
+        }
+    }
+    free(map->table);
 }
 
 

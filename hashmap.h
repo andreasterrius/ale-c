@@ -14,10 +14,10 @@
 #define INITIAL_TABLE_SIZE 100
 #define LOAD_FACTOR 0.7
 
-struct AlKeyValuePair {
+typedef struct AlKeyValuePair {
     char* key;
     void* value;
-};
+} AlKeyValuePair;
 
 typedef struct AlHashMap {
     usize tableSize;
@@ -28,13 +28,15 @@ typedef struct AlHashMap {
 
 unsigned int hash(char* key, int table_size);
 
-void alHashMapInit(AlHashMap* map, usize elementSize, usize capacity);
+void alHashMapInit(AlHashMap* map, usize capacity);
 
 void alHashMapGrow(AlHashMap* map);
 
 void alHashMapInsert(AlHashMap* map, char* key, void* value);
 
 void* alHashMapGet(AlHashMap map, char* key);
+
+void alHashMapDeinit(AlHashMap *map, bool freeContents);
 
 
 #endif //HELLO_C_HASHMAP_H
