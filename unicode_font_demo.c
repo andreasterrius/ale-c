@@ -12,15 +12,12 @@ int main() {
     SetTargetFPS(60);
 
     AlArray ranges;
-    alArrayInit(&ranges, sizeof(AlUnicodeFontRange), 3);
+    alArrayInit(&ranges, sizeof(AlUnicodeFontRange), 4);
     defer{ alArrayDeinit(&ranges); };
     alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 12352, .end=12543}));
     alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 19968, .end=40959}));
-    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 116, .end=300}));
-//    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 100, .end=200}));
-//    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 400, .end=500}));
-//    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 600, .end=800}));
-
+    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 0, .end=255}));
+    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 44032, .end=55215}));
 
     AlUnicodeFont customFont;
     bool ok = alUnicodeFontInit(&customFont, "resources/font/NotoSansCJKjp-VF.ttf", 24, ranges);

@@ -220,19 +220,6 @@ bool alUnicodeFontInit(AlUnicodeFont *self,
         }
     }
 
-    for (int i = 0; i < alArraySize(self->fonts); ++i) {
-        Font *f = (Font *) alArrayGet(self->fonts, i);
-        printf("%d count: %d\n", i, f->glyphCount);
-    }
-    int codePointSize;
-    int codepoint = GetCodepoint("ご", &codePointSize);
-    char buffer[12];
-    sprintf(buffer, "%d", codepoint);
-
-    Font **bf = alHashMapGet(self->codepointToFontMap, buffer);
-    printf("HASHMAP BF count: %d\n", bf == NULL ? 0 : (*bf)->glyphCount);
-
-    fflush(stdout);
     return true;
 }
 
