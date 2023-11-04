@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
             .scale = Vector3One(),
     };
     object.model = LoadModelFromMesh(GenMeshCube(2.0f, 1.0f, 1.0f));
+    object.hasTransformChanged = true;
 
     AlObject anotherObject;
     anotherObject.transform = (Transform) {
@@ -39,17 +40,17 @@ int main(int argc, char **argv) {
             .rotation = QuaternionIdentity()
     };
     anotherObject.model = LoadModelFromMesh(GenMeshSphere(2.0f, 16, 16));
+    anotherObject.hasTransformChanged = true;
 
     // let's add this manually for now
-    //g_array_append_val(sceneEditor.objects, object);
-    kv_push(AlObject, sceneEditor.objects, object);
-    kv_push(AlObject, sceneEditor.objects, object);
-    //    g_array_append_val(sceneEditor.objects, anotherObject);
+    alArrayPush(&sceneEditor.objects, &object);
+    alArrayPush(&sceneEditor.objects, &anotherObject);
 
     while (!WindowShouldClose()) {
+        float deltaTime = GetFrameTime();
 
         alSceneEditorHandleInput(&sceneEditor);
-        alObjectTryRecalculate(&object);
+        alSceneEditorTick(&sceneEditor, deltaTime);
 
         alSceneEditorRender(&sceneEditor);
 

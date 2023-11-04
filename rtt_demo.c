@@ -50,8 +50,8 @@ int main(int argc, char **argv) {
         }
 
         {
-            alRttBeginRender(&viewport);
-            defer { alRttEndRender(viewport); };
+            alRttBeginRenderToTexture(&viewport);
+            defer { alRttEndRenderToTexture(viewport); };
 
             DrawFPS(10, 10);
             DrawText("viewport demo!", 100, 100, 20, YELLOW);
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
             BeginDrawing();
             defer{ EndDrawing(); };
 
-            alRttRenderToScreen(viewport);
+            alRttRenderTexture(viewport);
 
             ClearBackground(SKYBLUE);
         }

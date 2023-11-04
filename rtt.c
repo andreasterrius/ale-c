@@ -26,8 +26,9 @@ void alRttInit(AlRtt *self, Rectangle *dest) {
     self->renderTexture2D = LoadRenderTexture(self->dest.width, self->dest.height);
 }
 
-void alRttBeginRender(AlRtt *self) {
+void alRttBeginRenderToTexture(AlRtt *self) {
 
+    // TODO: Move this somewhere, this function should not change anything
     // just stretch this for now
     if(self->stretchToScreenSize && IsWindowResized()) {
         self->dest.width = GetScreenWidth();
@@ -40,11 +41,11 @@ void alRttBeginRender(AlRtt *self) {
     ClearBackground(ColorAlpha(RED, 0.0f));
 }
 
-void alRttEndRender(AlRtt self) {
+void alRttEndRenderToTexture(AlRtt self) {
     EndTextureMode();
 }
 
-void alRttRenderToScreen(AlRtt self) {
+void alRttRenderTexture(AlRtt self) {
     BeginBlendMode(BLEND_ALPHA);
 
 

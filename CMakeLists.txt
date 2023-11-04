@@ -57,8 +57,6 @@ add_executable(scene_editor
         scene_editor.h
         rtt.c
         rtt.h
-        ui.h
-        ui.c
         array.h
         array.c
 )
@@ -83,8 +81,10 @@ target_link_libraries(rtt_demo PRIVATE raylib BlocksRuntime)
 ## ui_demo
 add_executable(ui_demo
         ui_demo.c
-        ui.h
-        ui.c
+        array.h
+        array.c
+        rtt.c
+        rtt.h
 )
 
 target_compile_options(ui_demo PRIVATE -fblocks)

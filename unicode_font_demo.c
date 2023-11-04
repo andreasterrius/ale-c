@@ -45,14 +45,6 @@ int main() {
 
         DrawRectangle(panel.x, panel.y, panel.width, panel.height, RED);
         alUnicodeFontRenderBoxed(&customFont, "test | 밥을 먹다 | ご飯を食べる", panel, 24, 1.0f, false, WHITE);
-//        alUnicodeFontRenderBoxed(&customFont, "ごべる", panel, 24, 1.0f, false, WHITE);
-
-        //DrawTextBoxed(fontEastern, "test | 밥을 먹다 | ご飯を食べる\n", panel, fontEastern.baseSize, 1.0f, true, WHITE);
-        //DrawTextEx(fontEastern, "test | 밥을 먹다 | ご飯を食べる\n", Vector2Zero(), fontEastern.baseSize, 1.0f, BLACK);
-
-        //alTextRendererRender(&customFont, "test | 밥을 먹다 | ご飯を食べる", (Rectangle){.x=0,.y=0,.width=0,.height=0});
-
-        // DrawTexture(texture2D, 0, 0, WHITE);
 
         ClearBackground(SKYBLUE);
     }

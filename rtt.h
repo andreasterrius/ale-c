@@ -22,11 +22,11 @@ void alRttInit(AlRtt *self, Rectangle *dest);
 
 void alRttDeinit(AlRtt *self);
 
-void alRttBeginRender(AlRtt *self);
+void alRttBeginRenderToTexture(AlRtt *self);
 
-void alRttEndRender(AlRtt self);
+void alRttEndRenderToTexture(AlRtt self);
 
-void alRttRenderToScreen(AlRtt self);
+void alRttRenderTexture(AlRtt self);
 
 /// Get mouse position IN the coordinates of the texture (dest.x dest.y as 0.0)
 Vector2 alRttGetMousePosition(AlRtt self);

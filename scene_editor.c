@@ -12,6 +12,7 @@ void alSceneEditorInit(AlSceneEditor *self, Camera3D camera, Vector2 *windowSize
     alArrayInit(&self->objects, sizeof(AlObject), 32);
     alGizmoInit(&self->gizmo);
     alRttInit(&self->gizmoViewport, NULL);
+    alRttInit(&self->sceneViewport, NULL);
     alArcCameraInputInit(&self->arcCameraInput);
 }
 
@@ -45,6 +46,7 @@ void alSceneEditorHandleInput(AlSceneEditor *self) {
 void alSceneEditorDeinit(AlSceneEditor *self) {
     alGizmoDeinit(&self->gizmo);
     alRttDeinit(&self->gizmoViewport);
+    alRttDeinit(&self->sceneViewport);
     alArrayDeinit(&self->objects);
 }
 
@@ -54,7 +56,7 @@ bool alSceneEditorSelectObject(AlSceneEditor *self) {
         AlObject *obj = alArrayGet(self->objects, i);
         for (int j = 0; j < obj->model.meshCount; ++j) {
             RayCollision rayCollision = GetRayCollisionMesh(ray, obj->model.meshes[j], obj->model.transform);
-            if (rayCollision.hit) {
+            if (rayCollision.hit && self->selectedObject == NULL) {
                 self->selectedObject = obj; //dangerous? anyway selectedObject is non owning
                 return true;
             }
@@ -71,8 +73,8 @@ void alSceneEditorRender(const AlSceneEditor *self) {
 
     // Draw Gizmo
     {
-        alRttBeginRender(&self->gizmoViewport);
-        defer { alRttEndRender(self->gizmoViewport); };
+        alRttBeginRenderToTexture(&self->gizmoViewport);
+        defer { alRttEndRenderToTexture(self->gizmoViewport); };
 
         DrawFPS(10, 10);
         DrawText("scene editor demo!", 100, 100, 20, YELLOW);
@@ -102,7 +104,14 @@ void alSceneEditorRender(const AlSceneEditor *self) {
         }
 
         // Draw textures
-        alRttRenderToScreen(self->gizmoViewport);
+        alRttRenderTexture(self->gizmoViewport);
     }
 
+}
+
+void alSceneEditorTick(AlSceneEditor *self, float deltaTime) {
+    for(int i = 0; i < alArraySize(self->objects); ++i) {
+        AlObject *object = (AlObject*) alArrayGet(self->objects, i);
+        alObjectTryRecalculate(object);
+    }
 }

@@ -10,6 +10,8 @@ typedef struct AlObject {
     Model model;
 } AlObject;
 
+void alObjectInit(AlObject *self);
+
 void alObjectRecalculate(AlObject *self);
 
 // If the transform is changed, we should recalculate transform (Transform) -> model.transform (matrix)

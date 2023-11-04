@@ -25,3 +25,7 @@ void alObjectTryRecalculate(AlObject *self) {
 void alObjectDeinit(AlObject *self) {
     UnloadModel(self->model);
 }
+
+void alObjectInit(AlObject *self) {
+    self->hasTransformChanged = true;
+}

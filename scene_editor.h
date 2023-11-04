@@ -10,6 +10,7 @@
 #include"arc_camera.h"
 #include"array.h"
 #include"rtt.h"
+#include"types.h"
 
 typedef struct AlSceneEditor {
     // all objects currently in the scene
@@ -23,6 +24,8 @@ typedef struct AlSceneEditor {
     AlGizmo gizmo;
     AlRtt gizmoViewport;
 
+    AlRtt sceneViewport;
+
     // camera input state
     AlArcCameraInput arcCameraInput;
 
@@ -31,6 +34,8 @@ typedef struct AlSceneEditor {
 void alSceneEditorInit(AlSceneEditor *self, Camera3D camera, Vector2 *windowSize);
 
 void alSceneEditorDeinit(AlSceneEditor *self);
+
+void alSceneEditorTick(AlSceneEditor *self, float deltaTime);
 
 void alSceneEditorRender(const AlSceneEditor *self);
 
