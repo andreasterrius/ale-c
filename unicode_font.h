@@ -25,8 +25,6 @@ bool alUnicodeFontInit(AlUnicodeFont *self,
                        i32 fontSize,
                        AlArray ranges /*AlArray<AlUnicodeFontRange> */);
 
-void alUnicodeFontRender(AlUnicodeFont *self, const char *text, float fontSize);
-
 void alUnicodeFontRenderBoxed(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
 
 void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap,

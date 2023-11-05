@@ -27,20 +27,20 @@ typedef struct AlSceneEditor {
     // Scene viewport
     AlRtt sceneViewport;
 
-    // UI viewport
-
     // camera input state
     AlArcCameraInput arcCameraInput;
 
 } AlSceneEditor;
 
-void alSceneEditorInit(AlSceneEditor *self, Camera3D camera);
+void alSceneEditorInit(AlSceneEditor *self, Camera3D camera, Rectangle normalizedRect);
 
 void alSceneEditorDeinit(AlSceneEditor *self);
 
 void alSceneEditorTick(AlSceneEditor *self, float deltaTime);
 
 void alSceneEditorRender(const AlSceneEditor *self);
+
+void alSceneEditorRenderRtt(const AlSceneEditor *self);
 
 void alSceneEditorHandleInput(AlSceneEditor *self);
 

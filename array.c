@@ -14,6 +14,8 @@ bool alArrayInit(AlArray *self, usize elementSize, usize initialCapacity) {
     return true;
 }
 
+// This creates a copy of data in the allocated memory block of the array.
+// *data is safe to be free-d after this call (non-owning)
 bool alArrayPush(AlArray *self, void *data) {
     if (self->size >= self->capacity) {
         usize newCapacity = self->capacity * 2;

@@ -19,7 +19,7 @@ typedef struct AlRtt {
 
 /// normalizedDest=NULL means it will always stretch to screen size
 /// normalizedDest!=NULL means it will be copied and no reference will be made to it
-void alRttInit(AlRtt *self, Rectangle *normalizedDest);
+void alRttInit(AlRtt *self, Rectangle normalizedDest);
 
 void alRttDeinit(AlRtt *self);
 

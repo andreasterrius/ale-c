@@ -6,22 +6,19 @@
 #include "scene_editor.h"
 #include "defer.h"
 
-void alSceneEditorInit(AlSceneEditor *self, Camera3D camera) {
+void alSceneEditorInit(AlSceneEditor *self, Camera3D camera, Rectangle normalizedSceneRect) {
     self->selectedObject = NULL;
     self->camera = camera;
     alArrayInit(&self->objects, sizeof(AlObject), 32);
     alGizmoInit(&self->gizmo);
     alArcCameraInputInit(&self->arcCameraInput);
 
-    float sceneAspectRatio = GetScreenWidth()/GetScreenHeight();
-    Rectangle sceneRect = (Rectangle){.height=0.8f * sceneAspectRatio, .width=0.8f, .x=0.0f, .y=0.0f};
-    alRttInit(&self->sceneViewport, &sceneRect);
-    alRttInit(&self->gizmoViewport, &sceneRect);
+    alRttInit(&self->sceneViewport, normalizedSceneRect);
+    alRttInit(&self->gizmoViewport, normalizedSceneRect);
 }
 
 void alSceneEditorHandleInput(AlSceneEditor *self) {
-    // try selecting an object
-    // handle gizmo
+
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
         bool clickedSomething = alSceneEditorSelectObject(self);
 
@@ -104,19 +101,12 @@ void alSceneEditorRender(const AlSceneEditor *self) {
         }
         DrawGrid(10, 1.0f);
     }
+}
 
+void alSceneEditorRenderRtt(const AlSceneEditor *self) {
     // Draw everything to screen
-    {
-        BeginDrawing();
-        defer{ EndDrawing(); };
-
-        ClearBackground(BLACK);
-
-        // Draw rtt
-        alRttRenderTexture(self->sceneViewport);
-        alRttRenderTexture(self->gizmoViewport);
-    }
-
+    alRttRenderTexture(self->sceneViewport);
+    alRttRenderTexture(self->gizmoViewport);
 }
 
 void alSceneEditorTick(AlSceneEditor *self, float deltaTime) {

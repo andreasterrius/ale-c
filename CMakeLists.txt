@@ -59,10 +59,16 @@ add_executable(scene_editor
         rtt.h
         array.h
         array.c
+        src/ui/model_ui.h
+        src/ui/model_ui.c
+        unicode_font.c
+        unicode_font.h
+        hashmap.h
+        hashmap.c
 )
 target_compile_options(scene_editor PRIVATE -fblocks)
-target_include_directories(scene_editor PRIVATE ${RAYLIB_INCLUDE_DIRS})
-target_link_libraries(scene_editor PRIVATE raylib BlocksRuntime)
+target_include_directories(scene_editor PRIVATE ${RAYLIB_INCLUDE_DIRS} xxHash::xxhash)
+target_link_libraries(scene_editor PRIVATE raylib BlocksRuntime xxHash::xxhash)
 
 ## viewport_demo
 add_executable(rtt_demo

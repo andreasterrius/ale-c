@@ -10,12 +10,8 @@ void alRttDeinit(AlRtt *self) {
     UnloadRenderTexture(self->renderTexture2D);
 }
 
-void alRttInit(AlRtt *self, Rectangle *normalizedDest) {
-    if(normalizedDest == NULL) {
-        self->normalizedDest = (Rectangle){.height = 1.0f, .width = 1.0f, .x=0.0f, .y=0.0f};
-    } else {
-        self->normalizedDest = *normalizedDest;
-    }
+void alRttInit(AlRtt *self, Rectangle normalizedDest) {
+    self->normalizedDest = normalizedDest;
     self->actualDest = (Rectangle) {
             .width=GetScreenWidth() * self->normalizedDest.width,
             .height=GetScreenHeight() * self->normalizedDest.height,
