@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
         DrawFPS(10, 10);
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            if (alGizmoTryHold(&gizmo, &object.transform, camera)) {
+            if (alGizmoTryHold(&gizmo, &object.transform, GetMousePosition(), camera)) {
                 object.hasTransformChanged = true;
             }
         } else {

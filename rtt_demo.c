@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
         }
 
         {
-            alRttBeginRenderToTexture(&viewport);
+            alRttBeginRenderToTexture(viewport);
             defer { alRttEndRenderToTexture(viewport); };
 
             DrawFPS(10, 10);

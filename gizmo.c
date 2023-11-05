@@ -32,7 +32,7 @@ void alGizmoDeinit(AlGizmo *self) {
     }
 }
 
-bool alGizmoTryHold(AlGizmo *self, Transform *transform, Camera3D camera) {
+bool alGizmoTryHold(AlGizmo *self, Transform *transform, Vector2 mousePos, Camera3D camera) {
     // There's no currently active selected object
     if (transform == NULL) {
         self->isHidden = true;
@@ -52,7 +52,6 @@ bool alGizmoTryHold(AlGizmo *self, Transform *transform, Camera3D camera) {
     alGizmoScaleAll(self);
 
     // Try to check which arrow we're hitting
-    Vector2 mousePos = GetMousePosition();
     Ray ray = GetMouseRay(mousePos, camera);
 
     if (!self->initialClickInfo.exist) {

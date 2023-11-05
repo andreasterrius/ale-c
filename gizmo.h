@@ -56,7 +56,7 @@ void alGizmoInit(AlGizmo *self);
 /// This usually happens when user press and holding left click (handled by caller)
 /// This function is paired with release()
 /// Return bool if it's holding something
-bool alGizmoTryHold(AlGizmo *self, Transform *transform, Camera3D camera);
+bool alGizmoTryHold(AlGizmo *self, Transform *transform, Vector2 mousePos, Camera3D camera);
 
 void alGizmoRelease(AlGizmo *self);
 

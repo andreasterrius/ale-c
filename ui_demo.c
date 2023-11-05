@@ -35,7 +35,7 @@ int main() {
 
     AlModelListPanel modelListPanel;
     alRttInit(&modelListPanel.rtt, &(Rectangle){
-            .x = editorRtt.dest.width, .y = 0, .height=height, .width=width * 0.3f
+            .x = editorRtt.actualDest.width, .y = 0, .height=height, .width=width * 0.3f
     });
     modelListPanel.backgroundColor = RED;
 

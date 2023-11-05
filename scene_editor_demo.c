@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     camera.projection = CAMERA_PERSPECTIVE;
 
     AlSceneEditor sceneEditor;
-    alSceneEditorInit(&sceneEditor, camera, &windowSize);
+    alSceneEditorInit(&sceneEditor, camera);
     defer{ alSceneEditorDeinit(&sceneEditor); };
 
     AlObject object;

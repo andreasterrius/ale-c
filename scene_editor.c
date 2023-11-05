@@ -6,14 +6,17 @@
 #include "scene_editor.h"
 #include "defer.h"
 
-void alSceneEditorInit(AlSceneEditor *self, Camera3D camera, Vector2 *windowSize) {
+void alSceneEditorInit(AlSceneEditor *self, Camera3D camera) {
     self->selectedObject = NULL;
     self->camera = camera;
     alArrayInit(&self->objects, sizeof(AlObject), 32);
     alGizmoInit(&self->gizmo);
-    alRttInit(&self->gizmoViewport, NULL);
-    alRttInit(&self->sceneViewport, NULL);
     alArcCameraInputInit(&self->arcCameraInput);
+
+    float sceneAspectRatio = GetScreenWidth()/GetScreenHeight();
+    Rectangle sceneRect = (Rectangle){.height=0.8f * sceneAspectRatio, .width=0.8f, .x=0.0f, .y=0.0f};
+    alRttInit(&self->sceneViewport, &sceneRect);
+    alRttInit(&self->gizmoViewport, &sceneRect);
 }
 
 void alSceneEditorHandleInput(AlSceneEditor *self) {
@@ -22,7 +25,7 @@ void alSceneEditorHandleInput(AlSceneEditor *self) {
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
         bool clickedSomething = alSceneEditorSelectObject(self);
 
-        if (alGizmoTryHold(&self->gizmo, &self->selectedObject->transform, self->camera)) {
+        if (alGizmoTryHold(&self->gizmo, &self->selectedObject->transform, alRttGetMousePosition(self->sceneViewport), self->camera)) {
             self->selectedObject->hasTransformChanged = true;
             alObjectTryRecalculate(self->selectedObject);
             clickedSomething = true;
@@ -51,7 +54,7 @@ void alSceneEditorDeinit(AlSceneEditor *self) {
 }
 
 bool alSceneEditorSelectObject(AlSceneEditor *self) {
-    Ray ray = GetMouseRay(GetMousePosition(), self->camera);
+    Ray ray = alRttGetMouseRay(self->sceneViewport, self->camera);
     for (int i = 0; i < alArraySize(self->objects); ++i) {
         AlObject *obj = alArrayGet(self->objects, i);
         for (int j = 0; j < obj->model.meshCount; ++j) {
@@ -73,7 +76,7 @@ void alSceneEditorRender(const AlSceneEditor *self) {
 
     // Draw Gizmo
     {
-        alRttBeginRenderToTexture(&self->gizmoViewport);
+        alRttBeginRenderToTexture(self->gizmoViewport);
         defer { alRttEndRenderToTexture(self->gizmoViewport); };
 
         DrawFPS(10, 10);
@@ -85,25 +88,32 @@ void alSceneEditorRender(const AlSceneEditor *self) {
         alGizmoRender(self->gizmo);
     }
 
+    // Draw Scene
+    {
+        alRttBeginRenderToTexture(self->sceneViewport);
+        defer { alRttEndRenderToTexture(self->sceneViewport); };
+
+        ClearBackground(SKYBLUE);
+
+        // Draw objects
+        BeginMode3D(self->camera);
+        defer{ EndMode3D(); };
+        for (int i = 0; i < alArraySize(self->objects); ++i) {
+            AlObject *obj = alArrayGet(self->objects, i);
+            DrawModel(obj->model, Vector3Zero(), 1.0f, WHITE);
+        }
+        DrawGrid(10, 1.0f);
+    }
+
     // Draw everything to screen
     {
         BeginDrawing();
         defer{ EndDrawing(); };
 
-        ClearBackground(SKYBLUE);
+        ClearBackground(BLACK);
 
-        // Draw objects
-        {
-            BeginMode3D(self->camera);
-            defer{ EndMode3D(); };
-            for (int i = 0; i < alArraySize(self->objects); ++i) {
-                AlObject *obj = alArrayGet(self->objects, i);
-                DrawModel(obj->model, Vector3Zero(), 1.0f, WHITE);
-            }
-            DrawGrid(10, 1.0f);
-        }
-
-        // Draw textures
+        // Draw rtt
+        alRttRenderTexture(self->sceneViewport);
         alRttRenderTexture(self->gizmoViewport);
     }
 
@@ -114,4 +124,6 @@ void alSceneEditorTick(AlSceneEditor *self, float deltaTime) {
         AlObject *object = (AlObject*) alArrayGet(self->objects, i);
         alObjectTryRecalculate(object);
     }
+    alRttTryRecalculateRect(&self->gizmoViewport);
+    alRttTryRecalculateRect(&self->sceneViewport);
 }

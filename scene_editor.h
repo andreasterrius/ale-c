@@ -24,14 +24,17 @@ typedef struct AlSceneEditor {
     AlGizmo gizmo;
     AlRtt gizmoViewport;
 
+    // Scene viewport
     AlRtt sceneViewport;
+
+    // UI viewport
 
     // camera input state
     AlArcCameraInput arcCameraInput;
 
 } AlSceneEditor;
 
-void alSceneEditorInit(AlSceneEditor *self, Camera3D camera, Vector2 *windowSize);
+void alSceneEditorInit(AlSceneEditor *self, Camera3D camera);
 
 void alSceneEditorDeinit(AlSceneEditor *self);
 

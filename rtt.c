@@ -10,34 +10,24 @@ void alRttDeinit(AlRtt *self) {
     UnloadRenderTexture(self->renderTexture2D);
 }
 
-void alRttInit(AlRtt *self, Rectangle *dest) {
-    if(dest == NULL) {
-        self->dest = (Rectangle) {
-            .width=GetScreenWidth(),
-            .height=GetScreenHeight(),
-            .x=0,
-            .y=0,
-        };
-        self->stretchToScreenSize = true;
+void alRttInit(AlRtt *self, Rectangle *normalizedDest) {
+    if(normalizedDest == NULL) {
+        self->normalizedDest = (Rectangle){.height = 1.0f, .width = 1.0f, .x=0.0f, .y=0.0f};
     } else {
-        self->dest = *dest;
-        self->stretchToScreenSize = false;
+        self->normalizedDest = *normalizedDest;
     }
-    self->renderTexture2D = LoadRenderTexture(self->dest.width, self->dest.height);
+    self->actualDest = (Rectangle) {
+            .width=GetScreenWidth() * self->normalizedDest.width,
+            .height=GetScreenHeight() * self->normalizedDest.height,
+            .x=GetScreenWidth() * self->normalizedDest.x,
+            .y=GetScreenHeight() * self->normalizedDest.y,
+    };
+    self->renderTexture2D = LoadRenderTexture(self->actualDest.width, self->actualDest.height);
+    self->needRecalculateActualDest = false;
 }
 
-void alRttBeginRenderToTexture(AlRtt *self) {
-
-    // TODO: Move this somewhere, this function should not change anything
-    // just stretch this for now
-    if(self->stretchToScreenSize && IsWindowResized()) {
-        self->dest.width = GetScreenWidth();
-        self->dest.height = GetScreenHeight();
-        UnloadRenderTexture(self->renderTexture2D);
-        self->renderTexture2D = LoadRenderTexture(self->dest.width, self->dest.height);
-    }
-
-    BeginTextureMode(self->renderTexture2D);
+void alRttBeginRenderToTexture(AlRtt self) {
+    BeginTextureMode(self.renderTexture2D);
     ClearBackground(ColorAlpha(RED, 0.0f));
 }
 
@@ -54,7 +44,7 @@ void alRttRenderTexture(AlRtt self) {
     // We have to change the source if we want the texture to be properly sized
     DrawTexturePro(self.renderTexture2D.texture,
                    (Rectangle) {0.0f, 0.0f, self.renderTexture2D.texture.width, -self.renderTexture2D.texture.height},
-                   self.dest,
+                   self.actualDest,
                    Vector2Zero(), 0.0f, WHITE);
 
     EndBlendMode();
@@ -63,8 +53,8 @@ void alRttRenderTexture(AlRtt self) {
 Vector2 alRttGetMousePosition(AlRtt self) {
     Vector2 mousePos = GetMousePosition();
     Vector2 resultPos = (Vector2) {
-            .x = (float) GetScreenWidth() / self.dest.width * (mousePos.x - self.dest.x),
-            .y = (float) GetScreenHeight() / self.dest.height * (mousePos.y - self.dest.y)
+            .x = (float) GetScreenWidth() / self.actualDest.width * (mousePos.x - self.actualDest.x),
+            .y = (float) GetScreenHeight() / self.actualDest.height * (mousePos.y - self.actualDest.y)
     };
     return resultPos;
 }
@@ -73,4 +63,18 @@ Ray alRttGetMouseRay(AlRtt self, Camera3D camera) {
     Vector2 mousePos = alRttGetMousePosition(self);
     Ray ray = GetMouseRay(mousePos, camera);
     return ray;
+}
+
+void alRttTryRecalculateRect(AlRtt *self) {
+    if(self->needRecalculateActualDest || IsWindowResized()) {
+        self->actualDest = (Rectangle) {
+                .width=GetScreenWidth() * self->normalizedDest.width,
+                .height=GetScreenHeight() * self->normalizedDest.height,
+                .x=GetScreenWidth() * self->normalizedDest.x,
+                .y=GetScreenHeight() * self->normalizedDest.y,
+        };
+        UnloadRenderTexture(self->renderTexture2D);
+        self->renderTexture2D = LoadRenderTexture(self->actualDest.width, self->actualDest.height);
+        self->needRecalculateActualDest = false;
+    }
 }
