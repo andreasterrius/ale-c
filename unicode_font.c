@@ -16,24 +16,36 @@ i32 min(i32 a, i32 b) {
     }
 }
 
-void alUnicodeFontRenderBoxed(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing,
+i32 max(i32 a, i32 b) {
+    if (a >= b) {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+Rectangle alUnicodeFontMeasure(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap) {
+    return alUnicodeFontRenderSelectable(self, text, rec, fontSize, spacing, wordWrap, WHITE, 0, 0, WHITE, WHITE, false);
+}
+
+Rectangle alUnicodeFontRenderBoxed(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing,
                               bool wordWrap, Color tint) {
-    alUnicodeFontRenderSelectable(self, text, rec, fontSize, spacing, wordWrap, tint, 0, 0, WHITE, WHITE);
+    return alUnicodeFontRenderSelectable(self, text, rec, fontSize, spacing, wordWrap, tint, 0, 0, WHITE, WHITE, true);
 }
 
 // Copied directly from raylib example
-void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing,
-                                   bool wordWrap,
-                                   Color tint, int selectStart, int selectLength, Color selectTint,
-                                   Color selectBackTint) {
+Rectangle alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing,
+                                   bool wordWrap,Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint,
+                                   bool shouldRender) {
     if (alArraySize(self->fonts) == 0) {
         // no loaded font
-        return;
+        return (Rectangle){};
     }
     Font *baseFont = (Font *) alArrayGet(self->fonts, 0);
 
     int length = TextLength(text);  // Total length in bytes of the text, scanned by codepoints in loop
 
+    float maxTextOffsetX = 0.0f;
     float textOffsetY = 0.0f;       // Offset between lines (on line break '\n')
     float textOffsetX = 0.0f;       // Offset X to next character to draw
 
@@ -48,7 +60,6 @@ void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectan
     int startLine = -1;         // Index where to begin drawing (where a line begins)
     int endLine = -1;           // Index where to stop drawing (where a line ends)
     int lastk = -1;             // Holds last value of the character position
-
 
     for (int i = 0, k = 0; i < length; i++, k++) {
         // Get next codepoint from byte string and glyph index in font
@@ -131,13 +142,15 @@ void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectan
                 // Draw selection background
                 bool isGlyphSelected = false;
                 if ((selectStart >= 0) && (k >= selectStart) && (k < (selectStart + selectLength))) {
-                    DrawRectangleRec((Rectangle) {rec.x + textOffsetX - 1, rec.y + textOffsetY, glyphWidth,
-                                                  (float) font->baseSize * scaleFactor}, selectBackTint);
-                    isGlyphSelected = true;
+                    if(shouldRender){
+                        DrawRectangleRec((Rectangle) {rec.x + textOffsetX - 1, rec.y + textOffsetY, glyphWidth,
+                                                      (float) font->baseSize * scaleFactor}, selectBackTint);
+                        isGlyphSelected = true;
+                    }
                 }
 
                 // Draw current character glyph
-                if ((codepoint != ' ') && (codepoint != '\t')) {
+                if ((codepoint != ' ') && (codepoint != '\t') && shouldRender) {
                     DrawTextCodepoint(*font, codepoint, (Vector2) {rec.x + textOffsetX, rec.y + textOffsetY}, fontSize,
                                       isGlyphSelected ? selectTint : tint);
                 }
@@ -157,7 +170,15 @@ void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectan
         }
 
         textOffsetX += glyphWidth;
+        maxTextOffsetX = max(textOffsetX, maxTextOffsetX);
     }
+
+    return (Rectangle){
+        .x = rec.x,
+        .y = rec.y,
+        .width = maxTextOffsetX,
+        .height = textOffsetY + (baseFont->baseSize + baseFont->baseSize / 2) * scaleFactor,
+    };
 }
 
 bool alUnicodeFontInit(AlUnicodeFont *self,

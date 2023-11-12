@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     AlModelUiEntry alModelUiEntry1;
     alModelUiEntry1.name = "someName";
     AlModelUiEntry alModelUiEntry2;
-    alModelUiEntry2.name = "anotherName123";
+    alModelUiEntry2.name = "anotherName123\nbeedfeg";
 
     alArrayPush(&modelUi.modelList, &alModelUiEntry1);
     alArrayPush(&modelUi.modelList, &alModelUiEntry2);
@@ -83,6 +83,7 @@ int main(int argc, char **argv) {
 
         alSceneEditorHandleInput(&sceneEditor);
         alSceneEditorTick(&sceneEditor, deltaTime);
+        alModelUiTick(&modelUi);
 
         alSceneEditorRender(&sceneEditor);
         alModelUiRender(&modelUi);

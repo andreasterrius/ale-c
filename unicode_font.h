@@ -25,10 +25,13 @@ bool alUnicodeFontInit(AlUnicodeFont *self,
                        i32 fontSize,
                        AlArray ranges /*AlArray<AlUnicodeFontRange> */);
 
-void alUnicodeFontRenderBoxed(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
+Rectangle alUnicodeFontMeasure(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap);
 
-void alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap,
-                                   Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint);
+// return the box
+Rectangle alUnicodeFontRenderBoxed(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
+
+Rectangle alUnicodeFontRenderSelectable(AlUnicodeFont *self, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap,
+                                   Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint, bool shouldRender);
 
 void alUnicodeFontDeinit(AlUnicodeFont *self);
 

@@ -12,6 +12,7 @@
 
 typedef struct AlModelUiEntry {
     char* name;
+
 } AlModelUiEntry;
 
 typedef struct AlModelUi {
@@ -24,6 +25,8 @@ typedef struct AlModelUi {
 void alModelUiInit(AlModelUi *self, AlUnicodeFont *unicodeFont, Rectangle normalizedDest);
 
 void alModelUiDeinit(AlModelUi *self);
+
+void alModelUiTick(AlModelUi *self);
 
 void alModelUiRender(AlModelUi *self);
 

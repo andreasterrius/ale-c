@@ -29,14 +29,15 @@ void alModelUiRender(AlModelUi *self) {
         alRttBeginRenderToTexture(self->view);
         defer { alRttEndRenderToTexture(self->view); };
 
-        DrawRectangle(0, 0, self->view.actualDest.width, self->view.actualDest.height, RED);
+        DrawRectangle(0, 0, self->view.actualDest.width, self->view.actualDest.height, BLACK);
 
         for(int i = 0; i < alArraySize(self->modelList); ++i) {
             AlModelUiEntry *entry = (AlModelUiEntry*) alArrayGet(self->modelList, i);
-            rect.y += 100;
+            Rectangle measuredRect = alUnicodeFontMeasure(self->unicodeFont, entry->name, rect,24, 1.0f, false);
 
-            alUnicodeFontRenderBoxed(self->unicodeFont, entry->name, rect, 24, 1.0f, false, WHITE);
-            //DrawText(entry->name, rect.x, rect.y, 20, WHITE);
+            DrawRectangle(measuredRect.x, measuredRect.y, measuredRect.width, measuredRect.height, BLUE);
+            alUnicodeFontRenderBoxed(self->unicodeFont, entry->name, rect,24, 1.0f, false, WHITE);
+            rect.y = measuredRect.y + measuredRect.height;
         }
     }
 }
