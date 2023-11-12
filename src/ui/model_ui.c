@@ -14,6 +14,10 @@ void alModelUiDeinit(AlModelUi *self) {
     alRttDeinit(&self->view);
 }
 
+void alModelUiTick(AlModelUi *self) {
+
+}
+
 void alModelUiRender(AlModelUi *self) {
     Rectangle rect = (Rectangle){
             .width = GetScreenWidth(),
