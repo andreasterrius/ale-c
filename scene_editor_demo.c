@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
     Rectangle sceneRect = (Rectangle){.height=0.8f * sceneAspectRatio, .width=0.8f, .x=0.0f, .y=0.0f};
     Rectangle modelUiRect = (Rectangle){.height=1.0f * sceneAspectRatio, .width=0.2f, .x=sceneRect.width, .y=0.0f};
 
+    // Load available models
     AlSceneEditor sceneEditor;
     alSceneEditorInit(&sceneEditor, camera, sceneRect);
     defer{ alSceneEditorDeinit(&sceneEditor); };
@@ -33,9 +34,9 @@ int main(int argc, char **argv) {
     AlArray ranges;
     alArrayInit(&ranges, sizeof(AlUnicodeFontRange), 4);
     defer{ alArrayDeinit(&ranges); };
+    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 0, .end=255}));
 //    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 12352, .end=12543}));
 //    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 19968, .end=40959}));
-    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 0, .end=255}));
 //    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 44032, .end=55215}));
 
     AlUnicodeFont unicodeFont;

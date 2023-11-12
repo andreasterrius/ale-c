@@ -29,12 +29,12 @@ int main() {
     SetTargetFPS(60);
 
     AlRtt editorRtt;
-    alRttInit(&editorRtt, &(Rectangle){
+    alRttInit(&editorRtt, (Rectangle){
         .x = 0, .y = 0, .height=height, .width=width * 0.7f
     });
 
     AlModelListPanel modelListPanel;
-    alRttInit(&modelListPanel.rtt, &(Rectangle){
+    alRttInit(&modelListPanel.rtt, (Rectangle){
             .x = editorRtt.actualDest.width, .y = 0, .height=height, .width=width * 0.3f
     });
     modelListPanel.backgroundColor = RED;
@@ -43,7 +43,7 @@ int main() {
 
         // Render editor
         {
-            alRttBeginRenderToTexture(&editorRtt);
+            alRttBeginRenderToTexture(editorRtt);
             defer{ alRttEndRenderToTexture(editorRtt); };
 
             // Render scene here
@@ -52,7 +52,7 @@ int main() {
 
         // Render UI
         {
-            alRttBeginRenderToTexture(&modelListPanel.rtt);
+            alRttBeginRenderToTexture(modelListPanel.rtt);
             defer{ alRttEndRenderToTexture(modelListPanel.rtt); };
 
             // Render UI here

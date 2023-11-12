@@ -4,10 +4,10 @@
 
 #include "hashmap.h"
 
-void alHashMapInit(AlHashMap* map, usize capacity){
+void alHashMapInit(AlHashMap* map, usize elementSize, usize capacity){
     map->tableSize = capacity + INITIAL_TABLE_SIZE;
     map->size = 0;
-    map->elementSize = sizeof(struct AlKeyValuePair);
+    map->elementSize = elementSize;
     map->table = (struct AlKeyValuePair*)malloc(map->tableSize * sizeof(struct AlKeyValuePair));
     for (int i = 0; i < map->tableSize; i++) {
         map->table[i].key = NULL;
@@ -15,20 +15,20 @@ void alHashMapInit(AlHashMap* map, usize capacity){
 }
 
 void alHashMapGrow(AlHashMap *map) {
-    int old_size = map->tableSize;
+    usize old_size = map->tableSize;
     map->tableSize *= 2;
     map->size = 0;
-    struct AlKeyValuePair* old_table = map->table;
+    AlKeyValuePair* old_table = map->table;
     map->table = (struct AlKeyValuePair*)malloc(map->tableSize * sizeof(struct AlKeyValuePair));
-    for (int i = 0; i < map->tableSize; i++) {
+    for (usize i = 0; i < map->tableSize; i++) {
         map->table[i].key = NULL;
     }
 
-    for (int i = 0; i < old_size; i++) {
+    for (usize i = 0; i < old_size; i++) {
         if (old_table[i].key != NULL) {
             alHashMapInsert(map, old_table[i].key, old_table[i].value);
             free(old_table[i].key);
-            //free(old_table[i].value);
+            free(old_table[i].value);
         }
     }
     free(old_table);
@@ -76,7 +76,7 @@ void* alHashMapGet(AlHashMap map, char* key){
 
 void alHashMapDeinit(AlHashMap *map, bool freeContents) {
     if(freeContents) {
-        for (int i = 0; i < map->size; ++i) {
+        for (int i = 0; i < map->tableSize; ++i) {
             if(map->table[i].key != NULL) {
                 free(map->table[i].key);
                 free(map->table[i].value);

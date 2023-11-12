@@ -65,6 +65,8 @@ add_executable(scene_editor
         unicode_font.h
         hashmap.h
         hashmap.c
+        src/ui/button.c
+        src/ui/button.h
 )
 target_compile_options(scene_editor PRIVATE -fblocks)
 target_include_directories(scene_editor PRIVATE ${RAYLIB_INCLUDE_DIRS} xxHash::xxhash)

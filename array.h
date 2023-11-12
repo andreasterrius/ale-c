@@ -28,4 +28,5 @@ i32 alArraySize(AlArray self);
 
 void alArrayDeinit(AlArray *self);
 
+
 #endif //HELLO_C_ARRAY_H

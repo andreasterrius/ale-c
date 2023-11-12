@@ -8,8 +8,7 @@
 
 int testHashMapPrimitive() {
     AlHashMap map;
-    alHashMapInit(&map, 0);
-    defer{ alHashMapDeinit(&map, true); };
+    alHashMapInit(&map, sizeof(int), 0);
 
     int a = 1;
     int b = 2;
@@ -27,6 +26,7 @@ int testHashMapPrimitive() {
     assert(*bb == 2);
     assert(*cc == 3);
 
+    alHashMapDeinit(&map, true);
     return 0;
 }
 
@@ -38,8 +38,7 @@ typedef struct HashMapTestData {
 
 int testHashMapStruct() {
     AlHashMap map;
-    alHashMapInit(&map, 3);
-    defer{ alHashMapDeinit(&map, true); };
+    alHashMapInit(&map, sizeof(HashMapTestData), 3);
 
     alHashMapInsert(&map, "one", &(HashMapTestData){
         .a = 1,
@@ -73,6 +72,7 @@ int testHashMapStruct() {
     assert(cc->b == 12321.123f);
     assert(strcmp(cc->dynamicString, "katon") == 0);
 
+    alHashMapDeinit(&map, true);
     return 0;
 }
 

@@ -31,8 +31,8 @@ int main(int argc, char **argv) {
     defer{ UnloadModel(model); };
 
     AlRtt viewport;
-    alRttInit(&viewport, NULL);
-    defer { alRttDeinit(&viewport); };
+    alRttInit(&viewport, (Rectangle) {.x = 0, .y = 0, .width=1.0, .height=1.0});
+    defer{ alRttDeinit(&viewport); };
 
     Ray ray = GetMouseRay(GetMousePosition(), camera);
     while (!WindowShouldClose()) {
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 
         {
             alRttBeginRenderToTexture(viewport);
-            defer { alRttEndRenderToTexture(viewport); };
+            defer{ alRttEndRenderToTexture(viewport); };
 
             DrawFPS(10, 10);
             DrawText("viewport demo!", 100, 100, 20, YELLOW);

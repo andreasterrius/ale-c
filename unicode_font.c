@@ -204,7 +204,7 @@ bool alUnicodeFontInit(AlUnicodeFont *self,
     }
 
     alArrayInit(&self->fonts, sizeof(Font), fontCount);
-    alHashMapInit(&self->codepointToFontMap, totalGlyphCount + (totalGlyphCount / 10 /*10% buffer just in case*/));
+    alHashMapInit(&self->codepointToFontMap, sizeof(void*), totalGlyphCount + (totalGlyphCount / 10 /*10% buffer just in case*/));
 
     int total = 0;
     for (int i = 0; i < alArraySize(ranges); ++i) {

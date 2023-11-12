@@ -23,12 +23,12 @@ typedef struct AlHashMap {
     usize tableSize;
     usize size; // Number of elements in the map
     usize elementSize; //sizeof(T)
-    struct AlKeyValuePair* table;
+    AlKeyValuePair* table;
 } AlHashMap;
 
 unsigned int hash(char* key, int table_size);
 
-void alHashMapInit(AlHashMap* map, usize capacity);
+void alHashMapInit(AlHashMap* map, usize elementSize, usize capacity);
 
 void alHashMapGrow(AlHashMap* map);
 

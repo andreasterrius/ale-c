@@ -56,4 +56,3 @@ void* alArrayGet(AlArray self, usize index) {
 void alArrayDeinit(AlArray *self) {
     free(self->data);
 }
-

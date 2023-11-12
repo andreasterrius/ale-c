@@ -14,10 +14,8 @@ typedef struct TestData {
 } TestData;
 
 int testArrayStruct() {
-
     AlArray myArray;
     alArrayInit(&myArray, sizeof(TestData), 0);
-    defer{ alArrayDeinit(&myArray); };
 
     alArrayPush(&myArray, &(TestData) {.id = 100, .someText="firstElement"});
     alArrayPush(&myArray, &(TestData) {.id= 200, .someText="secondelement"});
@@ -69,19 +67,21 @@ int testArrayStruct() {
     isOk = alArrayPop(&myArray);
     assert(isOk == false);
 
+    alArrayDeinit(&myArray);
+
     return 0;
 }
 
 int testArrayPrimitive() {
     AlArray myArray;
-    alArrayInit(&myArray, sizeof(TestData), 0);
-    defer{ alArrayDeinit(&myArray); };
+    alArrayInit(&myArray, sizeof(int), 0);
 
     int a = 1;
     int b = 2;
     int c = 3;
 
     alArrayPush(&myArray, &a);
+
     alArrayPush(&myArray, &b);
     alArrayPush(&myArray, &c);
     assert(alArraySize(myArray) == 3);
@@ -93,10 +93,12 @@ int testArrayPrimitive() {
     t = (int *) alArrayGet(myArray, 2);
     assert(*t == 3);
 
+    alArrayDeinit(&myArray);
     return 0;
 }
 
+
 int main(int argc, char **argv) {
     if (strcmp(argv[argc - 1], "testArrayStruct") == 0) return testArrayStruct();
-    if (strcmp(argv[argc - 1], "testArrayPrimitive") == 0) return testArrayPrimitive();
+    else if (strcmp(argv[argc - 1], "testArrayPrimitive") == 0) return testArrayPrimitive();
 }
