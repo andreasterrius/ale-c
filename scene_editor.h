@@ -14,7 +14,7 @@
 
 typedef struct AlSceneEditor {
     // all objects currently in the scene
-    AlArray objects; //AlAray<AlObject>
+    AlArray objects; //AlArray<AlObject>
     Camera3D camera;
 
     // currently selected object

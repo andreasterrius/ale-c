@@ -4,14 +4,13 @@
 #include "scene_editor.h"
 #include "src/ui/model_ui.h"
 #include "unicode_font.h"
-#include "defer.h"
 
 int main(int argc, char **argv) {
+    i32 errCode = 0;
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
     Vector2 windowSize = (Vector2) {.x = 800, .y=800};
     InitWindow(windowSize.x, windowSize.y, "Hello Editor");
-    defer{ CloseWindow(); };
 
     SetTargetFPS(60);
 
@@ -29,11 +28,10 @@ int main(int argc, char **argv) {
     // Load available models
     AlSceneEditor sceneEditor;
     alSceneEditorInit(&sceneEditor, camera, sceneRect);
-    defer{ alSceneEditorDeinit(&sceneEditor); };
 
     AlArray ranges;
     alArrayInit(&ranges, sizeof(AlUnicodeFontRange), 4);
-    defer{ alArrayDeinit(&ranges); };
+
     alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 0, .end=255}));
 //    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 12352, .end=12543}));
 //    alArrayPush(&ranges, &((AlUnicodeFontRange) {.start = 19968, .end=40959}));
@@ -41,13 +39,12 @@ int main(int argc, char **argv) {
 
     AlUnicodeFont unicodeFont;
     if(!alUnicodeFontInit(&unicodeFont, "resources/font/NotoSansCJKjp-VF.ttf", 24, ranges)){
-        return -1;
+        errCode = -1;
+        goto cleanupUnicode;
     }
-    defer { alUnicodeFontDeinit(&unicodeFont); };
 
     AlModelUi modelUi;
     alModelUiInit(&modelUi, &unicodeFont, modelUiRect);
-    defer{ alModelUiDeinit(&modelUi); };
 
     AlModelUiEntry alModelUiEntry1;
     alModelUiEntry1.name = "someName";
@@ -91,14 +88,23 @@ int main(int argc, char **argv) {
 
         {
             BeginDrawing();
-            defer{ EndDrawing(); };
+
             ClearBackground(SKYBLUE);
             alSceneEditorRenderRtt(&sceneEditor);
             alModelUiRenderRtt(&modelUi);
+
+            EndDrawing();
         }
 
         DrawGrid(10, 1.0f);
     }
 
-    return 0;
+    alModelUiDeinit(&modelUi);
+cleanupUnicode:
+    alUnicodeFontDeinit(&unicodeFont);
+    alArrayDeinit(&ranges);
+    alSceneEditorDeinit(&sceneEditor);
+    CloseWindow();
+
+    return errCode;
 }

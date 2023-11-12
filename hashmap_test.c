@@ -4,7 +4,6 @@
 
 #include <assert.h>
 #include"hashmap.h"
-#include"defer.h"
 
 int testHashMapPrimitive() {
     AlHashMap map;

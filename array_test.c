@@ -5,8 +5,6 @@
 #include <string.h>
 #include <stdio.h>
 #include "array.h"
-#include "types.h"
-#include "defer.h"
 
 typedef struct TestData {
     i32 id;

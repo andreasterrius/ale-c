@@ -3,7 +3,6 @@
 //
 
 #include "unicode_font.h"
-#include "defer.h"
 #include<xxhash.h>
 #include <stdio.h>
 #include<math.h>
@@ -188,7 +187,6 @@ bool alUnicodeFontInit(AlUnicodeFont *self,
     // Loading file to memory
     u32 fileSize = 0;
     unsigned char *fileData = LoadFileData(filePath, &fileSize);
-    defer { UnloadFileData(fileData); };
     char *fileExt = GetFileExtension(filePath);
 
     i32 glyphCountPerTexture = 1000;
@@ -219,7 +217,6 @@ bool alUnicodeFontInit(AlUnicodeFont *self,
             // for every unicode codepoint, establish connection between glyph->texture
             AlArray codepointToLoad;
             alArrayInit(&codepointToLoad, sizeof(int), end - start + 1);
-            defer{ alArrayDeinit(&codepointToLoad); };
 
             i32 c = 0;
             for (int k = start; k < end; ++k) {
@@ -238,9 +235,12 @@ bool alUnicodeFontInit(AlUnicodeFont *self,
                 alHashMapInsert(&self->codepointToFontMap, buffer, &arrayFontPtr);
             }
             total += c;
+
+            alArrayDeinit(&codepointToLoad);
         }
     }
 
+    UnloadFileData(fileData);
     return true;
 }
 

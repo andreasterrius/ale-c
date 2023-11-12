@@ -29,10 +29,8 @@ void alModelUiRender(AlModelUi *self) {
     alRttTryRecalculateRect(&self->view);
 
     // Draw Texts
+    alRttBeginRenderToTexture(self->view);
     {
-        alRttBeginRenderToTexture(self->view);
-        defer { alRttEndRenderToTexture(self->view); };
-
         DrawRectangle(0, 0, self->view.actualDest.width, self->view.actualDest.height, BLACK);
 
         for(int i = 0; i < alArraySize(self->modelList); ++i) {
@@ -44,6 +42,7 @@ void alModelUiRender(AlModelUi *self) {
             rect.y = measuredRect.y + measuredRect.height;
         }
     }
+    alRttEndRenderToTexture(self->view);
 }
 
 void alModelUiRenderRtt(AlModelUi *self) {

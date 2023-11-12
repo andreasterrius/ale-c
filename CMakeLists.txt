@@ -13,16 +13,13 @@ enable_testing()
 
 ## array_test
 add_executable(array_test array_test.c array.c array.h)
-target_compile_options(array_test PRIVATE -fblocks)
-target_link_libraries(array_test PRIVATE BlocksRuntime)
 add_test(NAME test_array_struct COMMAND array_test "testArrayStruct")
 add_test(NAME test_array_primitive COMMAND array_test "testArrayPrimitive")
 
 ## hashmap
 add_executable(hashmap_test hashmap_test.c hashmap.c hashmap.h)
-target_compile_options(hashmap_test PRIVATE -fblocks)
 target_include_directories(hashmap_test PRIVATE xxHash::xxhash)
-target_link_libraries(hashmap_test PRIVATE BlocksRuntime xxHash::xxhash)
+target_link_libraries(hashmap_test PRIVATE xxHash::xxhash)
 add_test(NAME test_hashmap_struct COMMAND hashmap_test "testHashMapStruct")
 add_test(NAME test_hashmap_primitive COMMAND hashmap_test "testHashMapPrimitive")
 add_test(NAME test_hashmap_grow COMMAND hashmap_test "testHashMapGrow")
@@ -68,9 +65,8 @@ add_executable(scene_editor
         src/ui/button.c
         src/ui/button.h
 )
-target_compile_options(scene_editor PRIVATE -fblocks)
 target_include_directories(scene_editor PRIVATE ${RAYLIB_INCLUDE_DIRS} xxHash::xxhash)
-target_link_libraries(scene_editor PRIVATE raylib BlocksRuntime xxHash::xxhash)
+target_link_libraries(scene_editor PRIVATE raylib xxHash::xxhash)
 
 ## viewport_demo
 add_executable(rtt_demo

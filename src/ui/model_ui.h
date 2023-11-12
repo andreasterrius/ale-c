@@ -8,7 +8,6 @@
 #include"../../array.h"
 #include"../../rtt.h"
 #include"../../unicode_font.h"
-#include"../../defer.h"
 
 typedef struct AlModelUiEntry {
     char* name;
