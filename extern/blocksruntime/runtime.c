@@ -75,6 +75,16 @@ static __inline bool OSAtomicCompareAndSwapInt(int oldi, int newi, int volatile 
   return __sync_bool_compare_and_swap(dst, oldi, newi);
 }
 
+#elif __unix__
+#include <stdatomic.h>
+static inline bool OSAtomicCompareAndSwapLong(long oldl, long newl, long volatile *dst) {
+    return atomic_compare_exchange_strong((atomic_long *)dst, &oldl, newl);
+}
+
+static inline bool OSAtomicCompareAndSwapInt(int oldi, int newi, int volatile *dst) {
+    return atomic_compare_exchange_strong((atomic_int *)dst, &oldi, newi);
+}
+
 #else
 #error unknown atomic compare-and-swap primitive
 #endif /* HAVE_OSATOMIC_COMPARE_AND_SWAP_INT && HAVE_OSATOMIC_COMPARE_AND_SWAP_LONG */
