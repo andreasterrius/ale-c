@@ -86,15 +86,14 @@ int main(int argc, char **argv) {
         alSceneEditorRender(&sceneEditor);
         alModelUiRender(&modelUi);
 
+        BeginDrawing();
         {
-            BeginDrawing();
 
             ClearBackground(SKYBLUE);
             alSceneEditorRenderRtt(&sceneEditor);
             alModelUiRenderRtt(&modelUi);
-
-            EndDrawing();
         }
+        EndDrawing();
 
         DrawGrid(10, 1.0f);
     }
