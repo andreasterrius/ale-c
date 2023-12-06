@@ -1,7 +1,7 @@
 #include <raylib.h>
 #include <raymath.h>
-#include "gizmo.h"
-#include "object.h"
+#include "../../gizmo.h"
+#include "../../object.h"
 
 int main(int argc, char **argv) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -25,7 +25,6 @@ int main(int argc, char **argv) {
     object.transform = (Transform) {.translation = Vector3Zero(), .scale = Vector3One(), .rotation = QuaternionIdentity()};
 
     AlGizmo gizmo;
-    alGizmoInit(&gizmo);
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -33,18 +32,18 @@ int main(int argc, char **argv) {
         DrawFPS(10, 10);
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            if (alGizmoTryHold(&gizmo, &object.transform, GetMousePosition(), camera)) {
+            if (gizmo.tryHold(&object.transform, GetMousePosition(), camera)) {
                 object.hasTransformChanged = true;
             }
         } else {
-            alGizmoRelease(&gizmo);
+            gizmo.release();
         }
 
         DrawText("gizmo demo!", 100, 100, 20, YELLOW);
         BeginMode3D(camera);
 
-        alObjectTryRecalculate(&object);
-        alGizmoRender(gizmo);
+        object.tryRecalculate();
+        gizmo.render();
 
         DrawModel(object.model, Vector3Zero(), 1.0f, WHITE);
         DrawGrid(10, 1.0f);
@@ -53,7 +52,6 @@ int main(int argc, char **argv) {
         EndDrawing();
     }
 
-    alGizmoDeinit(&gizmo);
     UnloadModel(object.model);
     CloseWindow();
     return 0;
