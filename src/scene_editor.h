@@ -35,8 +35,6 @@ public:
 
     AlSceneEditor(Camera3D camera, Rectangle normalizedRect);
 
-    ~AlSceneEditor();
-
     void tick(float deltaTime);
 
     void render();

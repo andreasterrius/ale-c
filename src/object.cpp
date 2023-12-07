@@ -4,6 +4,8 @@
 
 #include "object.h"
 
+#include <utility>
+
 void AlObject::recalculate() {
     Matrix matScale = MatrixScale(this->transform.scale.x, this->transform.scale.y, this->transform.scale.z);
     Matrix matRotation = QuaternionToMatrix(this->transform.rotation);
@@ -12,7 +14,7 @@ void AlObject::recalculate() {
                                             this->transform.translation.z);
 
     Matrix matTransform = MatrixMultiply(MatrixMultiply(matScale, matRotation), matTranslation);
-    this->model.d.transform = matTransform;
+    this->model->d.transform = matTransform;
 }
 
 void AlObject::tryRecalculate() {
@@ -23,6 +25,6 @@ void AlObject::tryRecalculate() {
 }
 
 
-AlObject::AlObject(Transform transform, RlModel model, bool hasTransformChanged) :
+AlObject::AlObject(Transform transform, std::shared_ptr<RlModel> model, bool hasTransformChanged) :
         transform(transform), model(std::move(model)), hasTransformChanged(hasTransformChanged){
 }

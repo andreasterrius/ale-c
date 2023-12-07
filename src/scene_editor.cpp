@@ -43,17 +43,13 @@ void AlSceneEditor::handleInput() {
     this->arcCameraInput.zoomOut(&this->camera);
 }
 
-AlSceneEditor::~AlSceneEditor() {
-
-}
-
 bool AlSceneEditor::selectObject() {
     Ray ray = this->sceneViewport.getMouseRay(this->camera);
     for (int i = 0; i < this->objects.size(); ++i) {
         AlObject *obj = &this->objects[i];
-        for (int j = 0; j < obj->model.d.meshCount; ++j) {
-            RayCollision rayCollision = GetRayCollisionMesh(ray, obj->model.d.meshes[j], obj->model.d.transform);
-            if (rayCollision.hit && this->selectedObjectIndex.has_value()) {
+        for (int j = 0; j < obj->model->d.meshCount; ++j) {
+            RayCollision rayCollision = GetRayCollisionMesh(ray, obj->model->d.meshes[j], obj->model->d.transform);
+            if (rayCollision.hit && !this->selectedObjectIndex.has_value()) {
                 this->selectedObjectIndex = std::make_optional(i);
                 return true;
             }
@@ -91,7 +87,7 @@ void AlSceneEditor::render() {
         {
             for (int i = 0; i < this->objects.size(); ++i) {
                 AlObject* obj = &this->objects[i];
-                DrawModel(obj->model.d, Vector3Zero(), 1.0f, WHITE);
+                DrawModel(obj->model->d, Vector3Zero(), 1.0f, WHITE);
             }
             DrawGrid(10, 1.0f);
         }

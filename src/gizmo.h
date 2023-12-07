@@ -4,6 +4,8 @@
 #include<raylib.h>
 #include<memory>
 #include"rtt.h"
+#include"rldata.h"
+#include<vector>
 
 typedef enum AlGizmo_ModelType {
     ArrowX, ArrowY, ArrowZ,
@@ -40,7 +42,7 @@ typedef struct AlGizmo_GrabAxis {
 class AlGizmo {
 #define MODELS_LEN 9
     // Meshes
-    std::unique_ptr<Model> models[MODELS_LEN];
+    std::vector<RlModel> models;
 
     // State
     bool isHidden;
@@ -52,18 +54,7 @@ class AlGizmo {
     AlGizmo_InitialClickInfo initialClickInfo;
 
 public:
-    // disable copy constructor.
-    AlGizmo (const AlGizmo&) = delete;
-    AlGizmo& operator= (const AlGizmo&) = delete;
-
-    // enable move constructor.
-    AlGizmo (AlGizmo&&) = default;
-    AlGizmo& operator= (AlGizmo&&) = default;
-
-public:
     AlGizmo();
-    ~AlGizmo();
-
 
     /// This usually happens when user press and holding left click (handled by caller)
     /// This function is paired with release()

@@ -6,32 +6,25 @@
 #include<raylib.h>
 #include<raymath.h>
 #include<memory>
+#include"rldata.h"
 
 /// Render To Texture
 /// Will render on the original screen then put into a texture
 class AlRtt {
-    std::unique_ptr<RenderTexture2D> renderTexture2D;
-
-    // Where and how big we want the texture to be rendered
-    Rectangle actualDest;
-    Rectangle normalizedDest;
-    bool needRecalculateActualDest;
+    RlRenderTexture2D renderTexture2D;
 
 public:
-    // disable copy constructor.
-    AlRtt (const AlRtt&) = delete;
-    AlRtt& operator= (const AlRtt&) = delete;
+    // Where and how big we want the texture to be rendered
+    Rectangle normalizedDest;
 
-    // enable move ctor
-    AlRtt (AlRtt&&) = default;
-    AlRtt& operator= (const AlRtt&&) = default;
+    /// Can be calculated automatically on tryRecalculateRect()
+    Rectangle actualDest;
+    bool needRecalculateActualDest;
 
 public:
     /// normalizedDest=NULL means it will always stretch to screen size
     /// normalizedDest!=NULL means it will be copied and no reference will be made to it
-    AlRtt(Rectangle normalizedDest);
-
-    ~AlRtt();
+    explicit AlRtt(Rectangle normalizedDest);
 
     void beginRenderToTexture();
 
@@ -39,7 +32,8 @@ public:
 
     void renderTexture();
 
-    void tryRecalculateRect();
+    /// If there's a window/layout resize, we need to call this
+    bool tryRecalculateRect();
 
     /// Get mouse position IN the coordinates of the texture (dest.x dest.y as 0.0)
     Vector2 getMousePosition();

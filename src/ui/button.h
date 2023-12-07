@@ -6,21 +6,32 @@
 #define HELLO_C_BUTTON_H
 
 #include <raylib.h>
-#include "../../types.h"
+#include <string>
+#include "../unicode_font.h"
 
-typedef struct AlButton {
+class AlButton {
+public:
+    /// This rect should be calculated by outside forces.
+    /// The button will never know how to layout itself.
     Rectangle rect;
-    char* text;
-    Color bgColor;
-    Color pressedBgColor;
 
-    bool isPressedThisFrame;
-} AlButton;
+    std::string label;
+    std::shared_ptr<AlUnicodeFont> font;
 
-void alButtonInit(AlButton *self, char *name);
+    Color currentColor;
+    Color normalColor;
+    Color hoverColor;
+    Color clickedColor;
 
-void alButtonTick(AlButton *self, Vector2 mousePosition);
+    AlButton(std::string label, std::shared_ptr<AlUnicodeFont> font, Color color);
 
-void alButtonDeinit(AlButton *self);
+    // Determine the (position,size) of the button, otherwise it will not be rendered
+    void setRect(Rectangle rect);
+
+    bool isClicked(Vector2 mousePosition, bool isMouseClicked);
+
+    void render();
+};
+
 
 #endif //HELLO_C_BUTTON_H

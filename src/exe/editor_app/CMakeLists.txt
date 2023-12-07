@@ -10,8 +10,10 @@ add_executable(editor_app editor_app.cpp
         ../../scene_editor.h
         ../../rtt.cpp
         ../../rtt.h
-#        ../../ui/model_ui.h
-#        ../../ui/model_ui.c
+        ../../ui/model_ui.h
+        ../../ui/model_ui.cpp
+        ../../ui/button.h
+        ../../ui/button.cpp
         ../../unicode_font.cpp
         ../../unicode_font.h
         ../../rldata.h

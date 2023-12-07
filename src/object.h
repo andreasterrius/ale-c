@@ -10,9 +10,9 @@ class AlObject {
 public:
     Transform transform;
     bool hasTransformChanged;
-    RlModel model;
+    std::shared_ptr<RlModel> model;
 
-    AlObject(Transform transform, RlModel model, bool hasTransformChanged);
+    AlObject(Transform transform, std::shared_ptr<RlModel> model, bool hasTransformChanged);
 
     void recalculate();
 

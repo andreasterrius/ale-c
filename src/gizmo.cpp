@@ -14,21 +14,16 @@ AlGizmo::AlGizmo() {
     this->gizmoType = Translate;
     this->isHidden = true;
 
-    this->models[ArrowX] = std::make_unique<Model>(LoadModel("resources/translate_gizmo/Arrow_X+.glb"));
-    this->models[ArrowY] = std::make_unique<Model>(LoadModel("resources/translate_gizmo/Arrow_Y+.glb"));
-    this->models[ArrowZ] = std::make_unique<Model>(LoadModel("resources/translate_gizmo/Arrow_Z+.glb"));
-    this->models[PlaneXY] = std::make_unique<Model>(LoadModel("resources/translate_gizmo/Plane_XY.glb"));
-    this->models[PlaneXZ] = std::make_unique<Model>(LoadModel("resources/translate_gizmo/Plane_XZ.glb"));
-    this->models[PlaneYZ] = std::make_unique<Model>(LoadModel("resources/translate_gizmo/Plane_YZ.glb"));
-    this->models[RotationXY] = std::make_unique<Model>(LoadModel("resources/translate_gizmo/Ring_XY.glb"));
-    this->models[RotationXZ] = std::make_unique<Model>(LoadModel("resources/translate_gizmo/Ring_XZ.glb"));
-    this->models[RotationYZ] = std::make_unique<Model>(LoadModel("resources/translate_gizmo/Ring_YZ.glb"));
-}
-
-AlGizmo::~AlGizmo() {
-    for (int i = 0; i < MODELS_LEN; ++i) {
-        UnloadModel(*this->models[i]);
-    }
+    this->models.reserve(MODELS_LEN);
+    this->models.emplace_back(LoadModel("resources/translate_gizmo/Arrow_X+.glb")); //ArrowX
+    this->models.emplace_back( LoadModel("resources/translate_gizmo/Arrow_Y+.glb")); //ArrowY
+    this->models.emplace_back( LoadModel("resources/translate_gizmo/Arrow_Z+.glb")); //ArrowY
+    this->models.emplace_back(LoadModel("resources/translate_gizmo/Plane_XY.glb")); //PlaneXY
+    this->models.emplace_back(LoadModel("resources/translate_gizmo/Plane_XZ.glb")); //PlaneXZ
+    this->models.emplace_back(LoadModel("resources/translate_gizmo/Plane_YZ.glb")); //PlaneYZ
+    this->models.emplace_back(LoadModel("resources/translate_gizmo/Ring_XY.glb")); //Ring_XY
+    this->models.emplace_back(LoadModel("resources/translate_gizmo/Ring_XZ.glb")); //Ring_XZ
+    this->models.emplace_back(LoadModel("resources/translate_gizmo/Ring_YZ.glb")); //Ring_YZ
 }
 
 bool AlGizmo::tryHold(Transform *transform, Vector2 mousePos, Camera3D camera) {
@@ -112,15 +107,15 @@ void AlGizmo::release() {
 }
 
 void AlGizmo::scaleAll() {
-    this->models[ArrowX]->transform = MatrixScale(this->scale, this->scale, this->scale);
-    this->models[ArrowY]->transform = MatrixScale(this->scale, this->scale, this->scale);
-    this->models[ArrowZ]->transform = MatrixScale(this->scale, this->scale, this->scale);
-    this->models[PlaneXY]->transform = MatrixScale(this->scale, this->scale, this->scale);
-    this->models[PlaneXZ]->transform = MatrixScale(this->scale, this->scale, this->scale);
-    this->models[PlaneYZ]->transform = MatrixScale(this->scale, this->scale, this->scale);
-    this->models[RotationXY]->transform = MatrixScale(this->scale, this->scale, this->scale);
-    this->models[RotationXZ]->transform = MatrixScale(this->scale, this->scale, this->scale);
-    this->models[RotationYZ]->transform = MatrixScale(this->scale, this->scale, this->scale);
+    this->models[ArrowX].d.transform = MatrixScale(this->scale, this->scale, this->scale);
+    this->models[ArrowY].d.transform = MatrixScale(this->scale, this->scale, this->scale);
+    this->models[ArrowZ].d.transform = MatrixScale(this->scale, this->scale, this->scale);
+    this->models[PlaneXY].d.transform = MatrixScale(this->scale, this->scale, this->scale);
+    this->models[PlaneXZ].d.transform = MatrixScale(this->scale, this->scale, this->scale);
+    this->models[PlaneYZ].d.transform = MatrixScale(this->scale, this->scale, this->scale);
+    this->models[RotationXY].d.transform = MatrixScale(this->scale, this->scale, this->scale);
+    this->models[RotationXZ].d.transform = MatrixScale(this->scale, this->scale, this->scale);
+    this->models[RotationYZ].d.transform = MatrixScale(this->scale, this->scale, this->scale);
 }
 
 AlGizmo_GrabAxis AlGizmo::grabAxis(Ray ray) {
@@ -129,42 +124,42 @@ AlGizmo_GrabAxis AlGizmo::grabAxis(Ray ray) {
     Matrix transform = MatrixMultiply(transformScale, transformTranslate);
 
     if (this->gizmoType == Translate || this->gizmoType == Scale) {
-        RayCollision coll = GetRayCollisionMesh(ray, this->models[ArrowX]->meshes[0], transform);
+        RayCollision coll = GetRayCollisionMesh(ray, this->models[ArrowX].d.meshes[0], transform);
         if (coll.hit) {
             return (AlGizmo_GrabAxis) {
                     .rayCollision = coll,
                     .activeAxis = X
             };
         }
-        coll = GetRayCollisionMesh(ray, this->models[ArrowY]->meshes[0], transform);
+        coll = GetRayCollisionMesh(ray, this->models[ArrowY].d.meshes[0], transform);
         if (coll.hit) {
             return (AlGizmo_GrabAxis) {
                     .rayCollision = coll,
                     .activeAxis = Y
             };
         }
-        coll = GetRayCollisionMesh(ray, this->models[ArrowZ]->meshes[0], transform);
+        coll = GetRayCollisionMesh(ray, this->models[ArrowZ].d.meshes[0], transform);
         if (coll.hit) {
             return (AlGizmo_GrabAxis) {
                     .rayCollision = coll,
                     .activeAxis = Z
             };
         }
-        coll = GetRayCollisionMesh(ray, this->models[PlaneYZ]->meshes[0], transform);
+        coll = GetRayCollisionMesh(ray, this->models[PlaneYZ].d.meshes[0], transform);
         if (coll.hit) {
             return (AlGizmo_GrabAxis) {
                     .rayCollision = coll,
                     .activeAxis = YZ
             };
         }
-        coll = GetRayCollisionMesh(ray, this->models[PlaneXZ]->meshes[0], transform);
+        coll = GetRayCollisionMesh(ray, this->models[PlaneXZ].d.meshes[0], transform);
         if (coll.hit) {
             return (AlGizmo_GrabAxis) {
                     .rayCollision = coll,
                     .activeAxis = XZ
             };
         }
-        coll = GetRayCollisionMesh(ray, this->models[PlaneXY]->meshes[0], transform);
+        coll = GetRayCollisionMesh(ray, this->models[PlaneXY].d.meshes[0], transform);
         if (coll.hit) {
             return (AlGizmo_GrabAxis) {
                     .rayCollision = coll,
@@ -172,21 +167,21 @@ AlGizmo_GrabAxis AlGizmo::grabAxis(Ray ray) {
             };
         }
     } else if (this->gizmoType == Rotate) {
-        RayCollision coll = GetRayCollisionMesh(ray, this->models[RotationYZ]->meshes[0], transform);
+        RayCollision coll = GetRayCollisionMesh(ray, this->models[RotationYZ].d.meshes[0], transform);
         if (coll.hit) {
             return (AlGizmo_GrabAxis) {
                     .rayCollision = coll,
                     .activeAxis = YZ
             };
         }
-        coll = GetRayCollisionMesh(ray, this->models[RotationXZ]->meshes[0], transform);
+        coll = GetRayCollisionMesh(ray, this->models[RotationXZ].d.meshes[0], transform);
         if (coll.hit) {
             return (AlGizmo_GrabAxis) {
                     .rayCollision = coll,
                     .activeAxis = XZ
             };
         }
-        coll = GetRayCollisionMesh(ray, this->models[RotationXY]->meshes[0], transform);
+        coll = GetRayCollisionMesh(ray, this->models[RotationXY].d.meshes[0], transform);
         if (coll.hit) {
             return (AlGizmo_GrabAxis) {
                     .rayCollision = coll,
@@ -196,8 +191,8 @@ AlGizmo_GrabAxis AlGizmo::grabAxis(Ray ray) {
     }
 
     return (AlGizmo_GrabAxis) {
-                .rayCollision = (RayCollision) {
-                .hit = false
+            .rayCollision = (RayCollision) {
+                    .hit = false
             }
     };
 }
@@ -267,16 +262,16 @@ void AlGizmo::render() {
 
     // Must be called inside BeginMode3D render
     if (this->gizmoType == Translate || this->gizmoType == Scale) {
-        DrawModel(*this->models[ArrowX], this->position, 1.0f, RED);
-        DrawModel(*this->models[ArrowY], this->position, 1.0f, GREEN);
-        DrawModel(*this->models[ArrowZ], this->position, 1.0f, BLUE);
-        DrawModel(*this->models[PlaneXY], this->position, 1.0f, BLUE);
-        DrawModel(*this->models[PlaneXZ], this->position, 1.0f, GREEN);
-        DrawModel(*this->models[PlaneYZ], this->position, 1.0f, RED);
+        DrawModel(this->models[ArrowX].d, this->position, 1.0f, RED);
+        DrawModel(this->models[ArrowY].d, this->position, 1.0f, GREEN);
+        DrawModel(this->models[ArrowZ].d, this->position, 1.0f, BLUE);
+        DrawModel(this->models[PlaneXY].d, this->position, 1.0f, BLUE);
+        DrawModel(this->models[PlaneXZ].d, this->position, 1.0f, GREEN);
+        DrawModel(this->models[PlaneYZ].d, this->position, 1.0f, RED);
     } else if (this->gizmoType == Rotate) {
-        DrawModel(*this->models[RotationXY], this->position, 1.0f, BLUE);
-        DrawModel(*this->models[RotationXZ], this->position, 1.0f, GREEN);
-        DrawModel(*this->models[RotationYZ], this->position, 1.0f, RED);
+        DrawModel(this->models[RotationXY].d, this->position, 1.0f, BLUE);
+        DrawModel(this->models[RotationXZ].d, this->position, 1.0f, GREEN);
+        DrawModel(this->models[RotationYZ].d, this->position, 1.0f, RED);
     }
 }
 

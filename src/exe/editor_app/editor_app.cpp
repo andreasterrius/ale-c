@@ -2,7 +2,7 @@
 #include<raymath.h>
 #include"../../object.h"
 #include"../../scene_editor.h"
-//#include "src/ui/model_ui.h"
+#include "../../ui/model_ui.h"
 #include"../../unicode_font.h"
 #include"../../rldata.h"
 #include<vector>
@@ -27,41 +27,39 @@ int main(int argc, char **argv) {
     Rectangle sceneRect = (Rectangle) {.height=0.8f * sceneAspectRatio, .width=0.8f, .x=0.0f, .y=0.0f};
     Rectangle modelUiRect = (Rectangle) {.height=1.0f * sceneAspectRatio, .width=0.2f, .x=sceneRect.width, .y=0.0f};
 
+    std::shared_ptr<AlUnicodeFont> unicodeFont = std::make_shared<AlUnicodeFont>(
+            "resources/font/NotoSansCJKjp-VF.ttf",
+            24,
+            std::vector{AlUnicodeFontRange{.start = 0, .end=255}}
+    );
+
     // Load available models
     AlSceneEditor sceneEditor(camera, sceneRect);
-
-    std::vector<AlUnicodeFontRange> ranges{
-            (AlUnicodeFontRange) {.start = 0, .end=255}
-    };
-    AlUnicodeFont unicodeFont("resources/font/NotoSansCJKjp-VF.ttf", 24, ranges);
-
-    sceneEditor.objects.emplace_back(
-            Transform{Vector3Zero(), QuaternionIdentity(), Vector3One()},
-            RlModel{LoadModelFromMesh(GenMeshCube(2.0f, 1.0f, 1.0f))},
-            true
-    );
-    sceneEditor.objects.emplace_back(
-            Transform{Vector3Zero(), QuaternionIdentity(), Vector3One()},
-            RlModel{LoadModelFromMesh(GenMeshSphere(2.0f, 16, 16))},
-            true
-    );
+    AlModelUi modelUi(unicodeFont, modelUiRect, "resources/models");
+    modelUi.loadedModelEntries.emplace_back(AlModelUi_Entry{
+            "cube",
+            std::make_shared<RlModel>(RlModel{LoadModelFromMesh(GenMeshCube(2.0f, 1.0f, 1.0f))})
+    });
+    modelUi.loadedModelEntries.emplace_back(AlModelUi_Entry{
+            "sphere",
+            std::make_shared<RlModel>(RlModel{LoadModelFromMesh(GenMeshSphere(2.0f, 16, 16))})
+    });
 
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
 
         sceneEditor.handleInput();
         sceneEditor.tick(deltaTime);
-//        alModelUiTick(&modelUi);
+        modelUi.tick(deltaTime);
 
         sceneEditor.render();
-//        alModelUiRender(&modelUi);
+        modelUi.render();
 
         BeginDrawing();
         {
-
             ClearBackground(SKYBLUE);
             sceneEditor.renderRtt();
-//            alModelUiRenderRtt(&modelUi);
+            modelUi.renderRtt();
         }
         EndDrawing();
 

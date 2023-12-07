@@ -5,30 +5,42 @@
 #ifndef HELLO_C_MODEL_PANEL_H
 #define HELLO_C_MODEL_PANEL_H
 
-#include"../../array.h"
-#include"../../rtt.h"
-#include"../../unicode_font.h"
+#include <string>
+#include <memory>
+#include"../rldata.h"
+#include"../unicode_font.h"
+#include"../rtt.h"
+#include "button.h"
+#include <optional>
 
-typedef struct AlModelUiEntry {
-    char* name;
+// Contains some metadata for the UI
+struct AlModelUi_Entry {
+    std::string name;
+    std::shared_ptr<RlModel> model;
 
-} AlModelUiEntry;
+    // Will be created after init
+    std::optional<AlButton> button;
+};
 
-typedef struct AlModelUi {
-    char* path;
-    AlArray modelList; /* AlArray<AlModelUiEntry> */
-    AlUnicodeFont *unicodeFont; /* Non-owning, unicode font has to outlive AlModelUi*/
+class AlModelUi {
+public:
+    std::shared_ptr<AlUnicodeFont> unicodeFont;
+    std::vector<AlModelUi_Entry> loadedModelEntries;
     AlRtt view;
-} AlModelUi;
 
-void alModelUiInit(AlModelUi *self, AlUnicodeFont *unicodeFont, Rectangle normalizedDest);
+    /// The UI will constantly poll watchDirPath when timeToWatchElapsedMs > timeToWatchMs
+    std::string watchDirPath;
+    float timeToWatchMs = 10.0f;
+    float timeToWatchElapsedMs;
 
-void alModelUiDeinit(AlModelUi *self);
+    AlModelUi(std::shared_ptr<AlUnicodeFont> font, Rectangle normalizedDest, std::string watchDirPath);
 
-void alModelUiTick(AlModelUi *self);
+    void tick(float dt);
 
-void alModelUiRender(AlModelUi *self);
+    void render();
 
-void alModelUiRenderRtt(AlModelUi *self);
+    void renderRtt();
+};
+
 
 #endif //HELLO_C_MODEL_PANEL_H
