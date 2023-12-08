@@ -14,22 +14,26 @@ public:
     /// This rect should be calculated by outside forces.
     /// The button will never know how to layout itself.
     Rectangle rect;
-
-    std::string label;
-    std::shared_ptr<AlUnicodeFont> font;
-
-    Color currentColor;
     Color normalColor;
     Color hoverColor;
     Color clickedColor;
 
+private:
+    std::string label;
+    std::shared_ptr<AlUnicodeFont> font;
+    bool isClicked;
+    bool isHovered;
+    Color currentColor;
+
+public:
     AlButton(std::string label, std::shared_ptr<AlUnicodeFont> font, Color color);
 
-    // Determine the (position,size) of the button, otherwise it will not be rendered
-    void setRect(Rectangle rect);
+    bool tick(Vector2 mousePosition, bool isMouseClicked);
 
-    bool isClicked(Vector2 mousePosition, bool isMouseClicked);
+    Rectangle measureLabelRect();
 
+    /// render() according to this->rect.
+    /// remember that this->rect should be set by outside forces before this is called.
     void render();
 };
 

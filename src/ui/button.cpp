@@ -3,7 +3,7 @@
 //
 
 #include "button.h"
-
+#include<iostream>
 #include <utility>
 
 AlButton::AlButton(std::string label, std::shared_ptr<AlUnicodeFont> font, Color color) :
@@ -12,23 +12,28 @@ AlButton::AlButton(std::string label, std::shared_ptr<AlUnicodeFont> font, Color
 
 }
 
-bool AlButton::isClicked(Vector2 mousePosition, bool isMouseClicked) {
-    if (this->rect.x < mousePosition.x && mousePosition.x > this->rect.x + this->rect.width &&
-        this->rect.y > mousePosition.y && mousePosition.y < this->rect.y + this->rect.height) {
-        return true;
+bool AlButton::tick(Vector2 mousePosition, bool isMouseClicked) {
+    this->isClicked = false;
+    this->isHovered = false;
+    currentColor = normalColor;
+    if (this->rect.x < mousePosition.x && mousePosition.x < this->rect.x + this->rect.width &&
+        this->rect.y < mousePosition.y && mousePosition.y < this->rect.y + this->rect.height) {
+        this->isHovered = true;
+        currentColor = hoverColor;
+
+        if(isMouseClicked) {
+            this->isClicked = true;
+            currentColor = clickedColor;
+        }
     }
-    return false;
+    return this->isClicked;
+}
+
+Rectangle AlButton::measureLabelRect() {
+    return this->font->measure(label.c_str(), rect, 24, 1.0f, false);
 }
 
 void AlButton::render() {
-    Rectangle measuredRect = this->font->measure(label.c_str(), rect, 24, 1.0f, false);
-
-    DrawRectangle(measuredRect.x, measuredRect.y, measuredRect.width, measuredRect.height, BLUE);
-    this->font->renderBoxed(label.c_str(), rect, 24, 1.0f, false, WHITE);
-    rect.y = measuredRect.y + measuredRect.height;
-
-}
-
-void AlButton::setRect(Rectangle rect) {
-    this->rect = rect;
+    DrawRectangle(this->rect.x, this->rect.y, this->rect.width, this->rect.height, this->currentColor);
+    this->font->renderBoxed(label.c_str(), this->rect, 24, 1.0f, false, WHITE);
 }

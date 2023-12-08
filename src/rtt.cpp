@@ -46,8 +46,8 @@ void AlRtt::renderTexture() {
 Vector2 AlRtt::getMousePosition() {
     Vector2 mousePos = GetMousePosition();
     Vector2 resultPos = (Vector2) {
-            .x = (float) GetScreenWidth() / this->actualDest.width * (mousePos.x - this->actualDest.x),
-            .y = (float) GetScreenHeight() / this->actualDest.height * (mousePos.y - this->actualDest.y)
+            .x = (float) this->actualDest.width / GetScreenWidth() * (mousePos.x - this->actualDest.x),
+            .y = (float) this->actualDest.height / GetScreenHeight() * (mousePos.y - this->actualDest.y)
     };
     return resultPos;
 }

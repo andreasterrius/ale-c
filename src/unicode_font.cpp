@@ -204,6 +204,6 @@ Rectangle AlUnicodeFont::renderSelectable(const char *text, Rectangle rec, float
             .x = rec.x,
             .y = rec.y,
             .width = maxTextOffsetX,
-            .height = textOffsetY + (baseFont->d.baseSize + baseFont->d.baseSize / 2) * scaleFactor,
+            .height = (baseFont->d.baseSize + baseFont->d.baseSize / 2) * scaleFactor,
     };
 }

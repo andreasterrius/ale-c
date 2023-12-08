@@ -40,10 +40,10 @@ int main(int argc, char **argv) {
             "cube",
             std::make_shared<RlModel>(RlModel{LoadModelFromMesh(GenMeshCube(2.0f, 1.0f, 1.0f))})
     });
-    modelUi.loadedModelEntries.emplace_back(AlModelUi_Entry{
-            "sphere",
-            std::make_shared<RlModel>(RlModel{LoadModelFromMesh(GenMeshSphere(2.0f, 16, 16))})
-    });
+//    modelUi.loadedModelEntries.emplace_back(AlModelUi_Entry{
+//            "sphere",
+//            std::make_shared<RlModel>(RlModel{LoadModelFromMesh(GenMeshSphere(2.0f, 16, 16))})
+//    });
 
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();

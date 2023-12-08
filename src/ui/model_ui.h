@@ -24,14 +24,19 @@ struct AlModelUi_Entry {
 
 class AlModelUi {
 public:
-    std::shared_ptr<AlUnicodeFont> unicodeFont;
     std::vector<AlModelUi_Entry> loadedModelEntries;
-    AlRtt view;
 
+private:
     /// The UI will constantly poll watchDirPath when timeToWatchElapsedMs > timeToWatchMs
     std::string watchDirPath;
     float timeToWatchMs = 10.0f;
     float timeToWatchElapsedMs;
+
+    AlRtt view;
+    std::shared_ptr<AlUnicodeFont> unicodeFont;
+    bool shouldRelayout;
+
+public:
 
     AlModelUi(std::shared_ptr<AlUnicodeFont> font, Rectangle normalizedDest, std::string watchDirPath);
 

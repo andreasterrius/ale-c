@@ -14,42 +14,53 @@ AlModelUi::AlModelUi(std::shared_ptr<AlUnicodeFont> unicodeFont, Rectangle norma
 void AlModelUi::tick(float dt) {
     // check whether we need to re-check the filesystem
     this->timeToWatchElapsedMs += dt;
-    if(this->timeToWatchElapsedMs > timeToWatchMs) {
+    if (this->timeToWatchElapsedMs > timeToWatchMs) {
         try {
             for (const auto &entry: fs::directory_iterator(this->watchDirPath)) {
                 std::cout << entry.path() << std::endl;
             }
-        } catch (const fs::filesystem_error& e) {
+        } catch (const fs::filesystem_error &e) {
             std::cerr << "Error accessing directory: " << e.what() << std::endl;
         }
     }
 
     //if button has not been created yet, let's create it
-    for(int i = 0; i < this->loadedModelEntries.size(); i++){
+    for (int i = 0; i < this->loadedModelEntries.size(); i++) {
         AlModelUi_Entry *entry = &this->loadedModelEntries[i];
-        if(!entry->button){
-            entry->button = AlButton("", this->unicodeFont, GREEN);
+        if (!entry->button) {
+            entry->button = AlButton(entry->name, this->unicodeFont, GREEN);
+            entry->button->hoverColor = PURPLE;
+            entry->button->clickedColor = DARKPURPLE;
+            this->shouldRelayout = true;
         }
-
-        // TODO: if button has been created, let's check it's collission box!
+        entry->button->tick(this->view.getMousePosition(), IsMouseButtonDown(MOUSE_BUTTON_LEFT));
     }
+
+    // do relayouting here
+    if (this->shouldRelayout) {
+        float currY = 0;
+        for (int i = 0; i < this->loadedModelEntries.size(); i++) {
+            AlModelUi_Entry *entry = &this->loadedModelEntries[i];
+            Rectangle labelRect = entry->button->measureLabelRect();
+            entry->button->rect = Rectangle{0, currY, this->view.actualDest.width, labelRect.height};
+            currY += labelRect.height;
+        }
+        this->shouldRelayout = false;
+    }
+
 }
 
 void AlModelUi::render() {
-    bool shouldRelayout = this->view.tryRecalculateRect();
+    this->shouldRelayout = this->view.tryRecalculateRect();
 
-    // Draw Texts
+    // Draw Buttons
     this->view.beginRenderToTexture();
     {
         DrawRectangle(0, 0, this->view.actualDest.width, this->view.actualDest.height, BLACK);
 
         for (int i = 0; i < this->loadedModelEntries.size(); ++i) {
             AlModelUi_Entry *entry = &this->loadedModelEntries[i];
-
-            if(entry->button) {
-                if(shouldRelayout || (entry->button->rect.height == 0 && entry->button->rect.width == 0)) {
-                    //TODO: calculate the button (position, size here)
-                }
+            if (entry->button) {
                 entry->button->render();
             }
         }
