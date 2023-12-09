@@ -17,20 +17,24 @@ public:
     Color normalColor;
     Color hoverColor;
     Color clickedColor;
+    Color labelColor;
 
 private:
     std::string label;
     std::shared_ptr<AlUnicodeFont> font;
-    bool isClicked;
+    bool isHeldDown;
     bool isHovered;
+    bool hasJustBeenPressed;
     Color currentColor;
 
 public:
-    AlButton(std::string label, std::shared_ptr<AlUnicodeFont> font, Color color);
+    AlButton(std::string label, std::shared_ptr<AlUnicodeFont> font, Color color, Color labelColor);
 
-    bool tick(Vector2 mousePosition, bool isMouseClicked);
+    void tick(Vector2 mousePosition, bool isMouseDown);
 
     Rectangle measureLabelRect();
+
+    bool getHasJustBeenPressed();
 
     /// render() according to this->rect.
     /// remember that this->rect should be set by outside forces before this is called.

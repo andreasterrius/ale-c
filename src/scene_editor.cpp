@@ -12,35 +12,47 @@ AlSceneEditor::AlSceneEditor(Camera3D camera, Rectangle normalizedSceneRect) :
 }
 
 void AlSceneEditor::handleInput() {
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-        bool clickedSomething = this->selectObject();
 
+    {
+        /// SECTION: Right click, camera rotation
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+            this->arcCameraInput.tryArcBall(&this->camera);
+        } else {
+            this->arcCameraInput.releaseArcBall();
+        }
+        this->arcCameraInput.zoomOut(&this->camera);
+    }
 
-        if (this->selectedObjectIndex.has_value()) {
+    {
+        /// SECTION: Gizmo + Mouse Click
+        bool clickedSomething = false;  // if we're clicking anything, this should be true.
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            clickedSomething = clickedSomething || this->selectObject();
+        }
+
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && this->selectedObjectIndex.has_value()) {
             AlObject *selectedObject = &this->objects[selectedObjectIndex.value()];
-            clickedSomething = this->gizmo.tryHold(&selectedObject->transform,
-                                                   this->sceneViewport.getMousePosition(),
-                                                   this->camera);
-            if (clickedSomething) {
-                selectedObject->hasTransformChanged = true;
-                selectedObject->tryRecalculate();
-            }
+            clickedSomething = clickedSomething || this->gizmo.tryHold(&selectedObject->transform,
+                                                                       this->sceneViewport.getScaledLocalMousePos(),
+                                                                       this->camera);
+            selectedObject->hasTransformChanged = true;
+        } else {
+            this->gizmo.release();
         }
 
-        if (!clickedSomething) {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !clickedSomething) {
             this->deselectObject();
+            this->gizmo.hide();
         }
-    } else {
-        this->gizmo.release();
-    }
 
-    // handle camera
-    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-        this->arcCameraInput.tryArcBall(&this->camera);
-    } else {
-        this->arcCameraInput.releaseArcBall();
+        if (IsKeyDown(KEY_W)) {
+            this->gizmo.gizmoType = AleGizmo_Type::Translate;
+        } else if (IsKeyDown(KEY_R)) {
+            this->gizmo.gizmoType = AleGizmo_Type::Rotate;
+        } else if (IsKeyDown(KEY_E)) {
+            this->gizmo.gizmoType = AleGizmo_Type::Scale;
+        }
     }
-    this->arcCameraInput.zoomOut(&this->camera);
 }
 
 bool AlSceneEditor::selectObject() {
@@ -86,7 +98,7 @@ void AlSceneEditor::render() {
         BeginMode3D(this->camera);
         {
             for (int i = 0; i < this->objects.size(); ++i) {
-                AlObject* obj = &this->objects[i];
+                AlObject *obj = &this->objects[i];
                 DrawModel(obj->model->d, Vector3Zero(), 1.0f, WHITE);
             }
             DrawGrid(10, 1.0f);

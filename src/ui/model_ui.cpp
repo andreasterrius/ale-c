@@ -2,6 +2,7 @@
 // Created by Alether on 11/5/2023.
 //
 #include "model_ui.h"
+#include "../rlmath.h"
 #include <iostream>
 #include <filesystem>
 
@@ -28,12 +29,12 @@ void AlModelUi::tick(float dt) {
     for (int i = 0; i < this->loadedModelEntries.size(); i++) {
         AlModelUi_Entry *entry = &this->loadedModelEntries[i];
         if (!entry->button) {
-            entry->button = AlButton(entry->name, this->unicodeFont, GREEN);
+            entry->button = AlButton(entry->name, this->unicodeFont, LIGHTGRAY, BLACK);
             entry->button->hoverColor = PURPLE;
             entry->button->clickedColor = DARKPURPLE;
             this->shouldRelayout = true;
         }
-        entry->button->tick(this->view.getMousePosition(), IsMouseButtonDown(MOUSE_BUTTON_LEFT));
+        entry->button->tick(this->view.getLocalMousePos(), IsMouseButtonDown(MOUSE_BUTTON_LEFT));
     }
 
     // do relayouting here
@@ -47,7 +48,6 @@ void AlModelUi::tick(float dt) {
         }
         this->shouldRelayout = false;
     }
-
 }
 
 void AlModelUi::render() {
@@ -70,4 +70,15 @@ void AlModelUi::render() {
 
 void AlModelUi::renderRtt() {
     this->view.renderTexture();
+}
+
+std::vector<AlObject> AlModelUi::getSpawnCommands() {
+    std::vector<AlObject> objects;
+    for(int i = 0; i < this->loadedModelEntries.size(); ++i) {
+        AlModelUi_Entry *entry = &this->loadedModelEntries[i];
+        if(entry->button && entry->button->getHasJustBeenPressed()){
+            objects.emplace_back(TransformOrigin(), entry->model, true);
+        }
+    }
+    return objects;
 }

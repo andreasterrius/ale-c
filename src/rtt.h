@@ -36,7 +36,15 @@ public:
     bool tryRecalculateRect();
 
     /// Get mouse position IN the coordinates of the texture (dest.x dest.y as 0.0)
-    Vector2 getMousePosition();
+    Vector2 getLocalMousePos();
+
+    /// Get mouse position IN the coordinates of the texture (dest.x dest.y as 0.0)
+    /// SCALED to screen size, usually used by GetMouseRay()
+    Vector2 getScaledLocalMousePos();
+
+    Vector2 getLocalToWorld(Vector2 localPos);
+
+    Vector2 getWorldToLocal(Vector2 worldPos);
 
     /// Shoot a ray with the given mouse position
     Ray getMouseRay(Camera3D camera);

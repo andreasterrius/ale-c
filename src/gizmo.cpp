@@ -305,3 +305,7 @@ Vector3 AlGizmo::handleTranslate(AlGizmo_ActiveAxis activeAxis, Vector3 rayPlane
 
     return Vector3Subtract(rayPlaneHitPoint, initialRayPos);
 }
+
+void AlGizmo::hide() {
+    this->isHidden = true;
+}

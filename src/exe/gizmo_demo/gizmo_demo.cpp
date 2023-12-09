@@ -1,7 +1,9 @@
 #include <raylib.h>
 #include <raymath.h>
+#include "../../rlmath.h"
 #include "../../gizmo.h"
 #include "../../object.h"
+#include <memory>
 
 int main(int argc, char **argv) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -15,14 +17,10 @@ int main(int argc, char **argv) {
     camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    AlObject object;
-    object.transform = (Transform) {
-            .translation = Vector3Zero(),
-            .rotation = QuaternionIdentity(),
-            .scale = Vector3One(),
-    };
-    object.model = LoadModelFromMesh(GenMeshCube(2.0f, 1.0f, 1.0f));
-    object.transform = (Transform) {.translation = Vector3Zero(), .scale = Vector3One(), .rotation = QuaternionIdentity()};
+    AlObject object(TransformOrigin(),
+                    std::make_shared<RlModel>(LoadModelFromMesh(GenMeshCube(2.0f, 1.0f, 1.0f))),
+                    true
+    );
 
     AlGizmo gizmo;
 
@@ -45,14 +43,12 @@ int main(int argc, char **argv) {
         object.tryRecalculate();
         gizmo.render();
 
-        DrawModel(object.model, Vector3Zero(), 1.0f, WHITE);
+        DrawModel(object.model.get()->d, Vector3Zero(), 1.0f, WHITE);
         DrawGrid(10, 1.0f);
 
         EndMode3D();
         EndDrawing();
     }
-
-    UnloadModel(object.model);
     CloseWindow();
     return 0;
 }

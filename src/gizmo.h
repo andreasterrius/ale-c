@@ -48,12 +48,13 @@ class AlGizmo {
     bool isHidden;
     Vector3 position;
     float scale;
-    AlGizmo_Type gizmoType;
 
     // if not null, then user has selected one of the axis
     AlGizmo_InitialClickInfo initialClickInfo;
 
 public:
+    AlGizmo_Type gizmoType;
+
     AlGizmo();
 
     /// This usually happens when user press and holding left click (handled by caller)
@@ -64,6 +65,8 @@ public:
     void release();
 
     void render();
+
+    void hide();
 
 private:
     void scaleAll();

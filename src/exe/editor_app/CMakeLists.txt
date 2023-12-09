@@ -17,7 +17,8 @@ add_executable(editor_app editor_app.cpp
         ../../unicode_font.cpp
         ../../unicode_font.h
         ../../rldata.h
-#        src/ui/button.c
+        ../../rlmath.h
+        #        src/ui/button.c
 #        src/ui/button.h
 )
 target_include_directories(editor_app PRIVATE ${RAYLIB_INCLUDE_DIRS})

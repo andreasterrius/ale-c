@@ -12,6 +12,7 @@
 #include"../rtt.h"
 #include "button.h"
 #include <optional>
+#include "../object.h"
 
 // Contains some metadata for the UI
 struct AlModelUi_Entry {
@@ -45,6 +46,8 @@ public:
     void render();
 
     void renderRtt();
+
+    std::vector<AlObject> getSpawnCommands();
 };
 
 

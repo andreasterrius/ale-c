@@ -43,20 +43,56 @@ void AlRtt::renderTexture() {
     EndBlendMode();
 }
 
-Vector2 AlRtt::getMousePosition() {
-    Vector2 mousePos = GetMousePosition();
-    Vector2 resultPos = (Vector2) {
-            .x = (float) this->actualDest.width / GetScreenWidth() * (mousePos.x - this->actualDest.x),
-            .y = (float) this->actualDest.height / GetScreenHeight() * (mousePos.y - this->actualDest.y)
-    };
+Vector2 AlRtt::getLocalMousePos() {
+    Vector2 worldMousePos = GetMousePosition();
+    Vector2 resultPos = this->getWorldToLocal(worldMousePos);
     return resultPos;
 }
 
 Ray AlRtt::getMouseRay(Camera3D camera) {
-    Vector2 mousePos = this->getMousePosition();
-    Ray ray = GetMouseRay(mousePos, camera);
+
+//    in case I get confused again
+//    Vector2 m = GetMousePosition();
+//    Vector2 worldPos = this->getLocalToWorld(mousePos);
+//    std::cout << "GetMousePosition(): " << m.x << "," << m.y << std::endl;
+//    std::cout << "localPos: " << mousePos.x << "," << mousePos.y << std::endl;
+//    std::cout << "worldPos: " << worldPos.x << "," << worldPos.y << std::endl;
+
+    // Due to how GetMouseRay() function works, we need to scale the mouse coordinate to screen size
+    Ray ray = GetMouseRay(this->getScaledLocalMousePos(), camera);
+
+//    std::cout << "scaledLocalMousePos: " << scaledLocalMousePos.x << "," << scaledLocalMousePos.y << std::endl;
+//    std::cout << std::endl;
+
     return ray;
 }
+
+Vector2 AlRtt::getScaledLocalMousePos() {
+    Vector2 mousePos = this->getLocalMousePos();
+    return Vector2{
+            GetScreenWidth() / this->actualDest.width * mousePos.x,
+            GetScreenHeight() / this->actualDest.height * mousePos.y};
+}
+
+// if screen is [800,600] and window is [400,300]
+// then 200,100 will become 100,50
+Vector2 AlRtt::getLocalToWorld(Vector2 localPos) {
+    return {
+            .x = this->actualDest.x + localPos.x,
+            .y = this->actualDest.y + localPos.y,
+    };
+}
+
+// if screen is [800,600] and window is [400,300]
+// then 200,100 will become 400,200
+// NOTE: the local coordinate will always be stretched to screen size because of how raylib works!
+Vector2 AlRtt::getWorldToLocal(Vector2 worldPos) {
+    return {
+            .x = worldPos.x - this->actualDest.x,
+            .y = worldPos.y - this->actualDest.y
+    };
+}
+
 
 bool AlRtt::tryRecalculateRect() {
     if (this->needRecalculateActualDest || IsWindowResized()) {
