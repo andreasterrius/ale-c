@@ -14,7 +14,7 @@ void AlObject::recalculate() {
                                             this->transform.translation.z);
 
     Matrix matTransform = MatrixMultiply(MatrixMultiply(matScale, matRotation), matTranslation);
-    this->model->d.transform = matTransform;
+    this->transformMat = matTransform;
 }
 
 void AlObject::tryRecalculate() {
@@ -25,6 +25,7 @@ void AlObject::tryRecalculate() {
 }
 
 
-AlObject::AlObject(Transform transform, std::shared_ptr<RlModel> model, bool hasTransformChanged) :
-        transform(transform), model(std::move(model)), hasTransformChanged(hasTransformChanged){
+AlObject::AlObject(Transform transform, std::shared_ptr<RlModel> model) :
+        transform(transform),  model(std::move(model)), hasTransformChanged(false), transformMat(MatrixIdentity()){
+    recalculate();
 }

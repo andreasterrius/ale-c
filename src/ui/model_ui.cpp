@@ -26,10 +26,10 @@ void AlModelUi::tick(float dt) {
     }
 
     //if button has not been created yet, let's create it
-    for (int i = 0; i < this->loadedModelEntries.size(); i++) {
-        AlModelUi_Entry *entry = &this->loadedModelEntries[i];
+    for (int i = 0; i < this->modelEntries.size(); i++) {
+        AlModelUi_Entry *entry = &this->modelEntries[i];
         if (!entry->button) {
-            entry->button = AlButton(entry->name, this->unicodeFont, LIGHTGRAY, BLACK);
+            entry->button = AlButton(entry->modelId, this->unicodeFont, LIGHTGRAY, BLACK);
             entry->button->hoverColor = PURPLE;
             entry->button->clickedColor = DARKPURPLE;
             this->shouldRelayout = true;
@@ -40,8 +40,8 @@ void AlModelUi::tick(float dt) {
     // do relayouting here
     if (this->shouldRelayout) {
         float currY = 0;
-        for (int i = 0; i < this->loadedModelEntries.size(); i++) {
-            AlModelUi_Entry *entry = &this->loadedModelEntries[i];
+        for (int i = 0; i < this->modelEntries.size(); i++) {
+            AlModelUi_Entry *entry = &this->modelEntries[i];
             Rectangle labelRect = entry->button->measureLabelRect();
             entry->button->rect = Rectangle{0, currY, this->view.actualDest.width, labelRect.height};
             currY += labelRect.height;
@@ -58,8 +58,8 @@ void AlModelUi::render() {
     {
         DrawRectangle(0, 0, this->view.actualDest.width, this->view.actualDest.height, BLACK);
 
-        for (int i = 0; i < this->loadedModelEntries.size(); ++i) {
-            AlModelUi_Entry *entry = &this->loadedModelEntries[i];
+        for (int i = 0; i < this->modelEntries.size(); ++i) {
+            AlModelUi_Entry *entry = &this->modelEntries[i];
             if (entry->button) {
                 entry->button->render();
             }
@@ -74,10 +74,12 @@ void AlModelUi::renderRtt() {
 
 std::vector<AlObject> AlModelUi::getSpawnCommands() {
     std::vector<AlObject> objects;
-    for(int i = 0; i < this->loadedModelEntries.size(); ++i) {
-        AlModelUi_Entry *entry = &this->loadedModelEntries[i];
-        if(entry->button && entry->button->getHasJustBeenPressed()){
-            objects.emplace_back(TransformOrigin(), entry->model, true);
+    for (int i = 0; i < this->modelEntries.size(); ++i) {
+        AlModelUi_Entry *entry = &this->modelEntries[i];
+        if (entry->button && entry->button->getHasJustBeenPressed()) {
+            objects.emplace_back(TransformOrigin(), entry->model);
+            objects.back().modelId = entry->modelId;
+            objects.back().modelPath = entry->modelPath;
         }
     }
     return objects;

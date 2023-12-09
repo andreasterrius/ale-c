@@ -32,7 +32,6 @@ class AlSceneEditor {
 public:
     // all objects currently in the scene
     std::vector<AlObject> objects;
-    std::string saveScenePath;
 
     AlSceneEditor(Camera3D camera, Rectangle normalizedRect);
 

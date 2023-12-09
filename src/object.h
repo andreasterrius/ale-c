@@ -8,11 +8,15 @@
 
 class AlObject {
 public:
+    Matrix transformMat;
     Transform transform;
     bool hasTransformChanged;
+
+    std::string modelId; // for internally created meshes
+    std::string modelPath; // for externally created meshes
     std::shared_ptr<RlModel> model;
 
-    AlObject(Transform transform, std::shared_ptr<RlModel> model, bool hasTransformChanged);
+    AlObject(Transform transform, std::shared_ptr<RlModel> model);
 
     void recalculate();
 

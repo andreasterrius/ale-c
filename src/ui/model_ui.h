@@ -16,7 +16,8 @@
 
 // Contains some metadata for the UI
 struct AlModelUi_Entry {
-    std::string name;
+    std::string modelId;
+    std::string modelPath;
     std::shared_ptr<RlModel> model;
 
     // Will be created after init
@@ -25,7 +26,7 @@ struct AlModelUi_Entry {
 
 class AlModelUi {
 public:
-    std::vector<AlModelUi_Entry> loadedModelEntries;
+    std::vector<AlModelUi_Entry> modelEntries;
 
 private:
     /// The UI will constantly poll watchDirPath when timeToWatchElapsedMs > timeToWatchMs
