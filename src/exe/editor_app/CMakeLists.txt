@@ -20,8 +20,10 @@ add_executable(editor_app editor_app.cpp
         ../../rlmath.h
         ../../scene_file_loader.cpp
         ../../scene_file_loader.h
+        ../../rljson.h
+        ../../rlmath.cpp
         #        src/ui/button.c
 #        src/ui/button.h
 )
 target_include_directories(editor_app PRIVATE ${RAYLIB_INCLUDE_DIRS})
-target_link_libraries(editor_app PRIVATE raylib)
+target_link_libraries(editor_app PRIVATE raylib nlohmann_json::nlohmann_json)

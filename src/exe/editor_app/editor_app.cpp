@@ -5,6 +5,7 @@
 #include "../../ui/model_ui.h"
 #include"../../unicode_font.h"
 #include"../../rldata.h"
+#include"../../scene_file_loader.h"
 #include<vector>
 
 int main(int argc, char **argv) {
@@ -34,7 +35,7 @@ int main(int argc, char **argv) {
     );
 
     // Let's do save and load here
-    SceneFileLoader sceneFileLoader;
+    AlSceneFileLoader sceneFileLoader("");
 
     // Load available models
     AlSceneEditor sceneEditor(camera, sceneRect);

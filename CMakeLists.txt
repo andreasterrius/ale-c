@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 ## dependencies
 add_subdirectory(extern/raylib)
+add_subdirectory(extern/json)
 
 enable_testing()
 add_subdirectory(src/data_old)

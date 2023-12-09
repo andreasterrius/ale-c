@@ -8,12 +8,6 @@
 #include"raylib.h"
 #include"raymath.h"
 
-Transform TransformOrigin() {
-    return Transform{
-            .translation=Vector3Zero(),
-            .rotation=QuaternionIdentity(),
-            .scale=Vector3One(),
-    };
-}
+Transform TransformOrigin();
 
 #endif //HELLO_C_RLMATH_H
