@@ -18,6 +18,8 @@ add_executable(editor_app editor_app.cpp
         ../../unicode_font.h
         ../../rldata.h
         ../../rlmath.h
+        ../../scene_file_loader.cpp
+        ../../scene_file_loader.h
         #        src/ui/button.c
 #        src/ui/button.h
 )

@@ -33,8 +33,13 @@ int main(int argc, char **argv) {
             std::vector{AlUnicodeFontRange{.start = 0, .end=255}}
     );
 
+    // Let's do save and load here
+    SceneFileLoader sceneFileLoader;
+
     // Load available models
     AlSceneEditor sceneEditor(camera, sceneRect);
+    sceneEditor.saveScenePath = "resources/scenes/editor01.json";
+
     AlModelUi modelUi(unicodeFont, modelUiRect, "resources/models");
     modelUi.loadedModelEntries.emplace_back(AlModelUi_Entry{
             "cube",
