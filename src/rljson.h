@@ -13,8 +13,8 @@ template<>
 struct nlohmann::adl_serializer<Vector3> {
     static void to_json(json &j, const Vector3 &value) {
         j["x"] = value.x;
-        j["y"] = value.x;
-        j["z"] = value.x;
+        j["y"] = value.y;
+        j["z"] = value.z;
     }
 
     static void from_json(const json &j, Vector3 &value) {
@@ -29,8 +29,8 @@ template<>
 struct nlohmann::adl_serializer<Quaternion> {
     static void to_json(json &j, const Quaternion &value) {
         j["x"] = value.x;
-        j["y"] = value.x;
-        j["z"] = value.x;
+        j["y"] = value.y;
+        j["z"] = value.z;
         j["w"] = value.w;
     }
 

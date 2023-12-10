@@ -72,7 +72,7 @@ void AlModelUi::renderRtt() {
     this->view.renderTexture();
 }
 
-std::vector<AlObject> AlModelUi::getSpawnCommands() {
+std::vector<AlObject> AlModelUi::getSpawnedObjects() {
     std::vector<AlObject> objects;
     for (int i = 0; i < this->modelEntries.size(); ++i) {
         AlModelUi_Entry *entry = &this->modelEntries[i];

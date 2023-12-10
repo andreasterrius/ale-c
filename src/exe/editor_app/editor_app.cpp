@@ -35,7 +35,8 @@ int main(int argc, char **argv) {
     );
 
     // Let's do save and load here
-    AlSceneFileLoader sceneFileLoader("resources/scenes/hello-scene.json");
+    AlSceneFileLoader sceneFileLoader("resources/scenes/hello-scene-01.json");
+    AlSceneEditor sceneEditor(camera, sceneRect);
 
     // Load available models
     std::unordered_map<std::string, std::shared_ptr<RlModel>> internalModels{
@@ -43,6 +44,11 @@ int main(int argc, char **argv) {
             {"sphere", std::make_shared<RlModel>(RlModel{LoadModelFromMesh(GenMeshSphere(2.0f, 16, 16))})}
     };
     std::unordered_map<std::string, std::shared_ptr<RlModel>> loadedModels{};
+
+    std::optional<AlSceneFileLoader_LoadedScene> loadedScene = sceneFileLoader.load(internalModels, loadedModels);
+    if(loadedScene.has_value()){
+        sceneEditor.objects.insert(sceneEditor.objects.end(), loadedScene->objects.begin(), loadedScene->objects.end());
+    }
 
     AlModelUi modelUi(unicodeFont, modelUiRect, "resources/models");
     for (auto &[k, v]: internalModels) {
@@ -52,16 +58,14 @@ int main(int argc, char **argv) {
         modelUi.modelEntries.emplace_back(AlModelUi_Entry{"", k, v});
     }
 
-    AlSceneEditor sceneEditor(camera, sceneRect);
-
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
 
         sceneEditor.handleInput();
         sceneEditor.tick(deltaTime);
-
         modelUi.tick(deltaTime);
-        std::vector<AlObject> newObjects = modelUi.getSpawnCommands();
+
+        std::vector<AlObject> newObjects = modelUi.getSpawnedObjects();
         if (!newObjects.empty())
             sceneEditor.objects.insert(sceneEditor.objects.end(), newObjects.begin(), newObjects.end());
 

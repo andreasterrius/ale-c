@@ -26,7 +26,6 @@ struct AlSceneFileLoader_SceneFile {
 };
 
 struct AlSceneFileLoader_LoadedScene {
-    std::unordered_map<std::string, std::shared_ptr<RlModel>> models;
     std::vector<AlObject> objects;
 };
 
@@ -38,7 +37,10 @@ public:
 
     bool save(std::vector<AlObject> &objects);
 
-    std::optional<AlSceneFileLoader_LoadedScene> load();
+    std::optional<AlSceneFileLoader_LoadedScene> load(
+        std::unordered_map<std::string, std::shared_ptr<RlModel>> &internalModels,
+        std::unordered_map<std::string, std::shared_ptr<RlModel>> &loadedModels //mutate this parameter
+    );
 };
 
 

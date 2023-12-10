@@ -48,7 +48,7 @@ public:
 
     void renderRtt();
 
-    std::vector<AlObject> getSpawnCommands();
+    std::vector<AlObject> getSpawnedObjects();
 };
 
 
