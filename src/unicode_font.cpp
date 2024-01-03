@@ -69,7 +69,7 @@ Rectangle AlUnicodeFont::renderSelectable(const char *text, Rectangle rec, float
                                           bool shouldRender) {
     if (this->fonts.size() == 0) {
         // no loaded font
-        return (Rectangle) {};
+        return Rectangle {};
     }
     RlFont *baseFont = &this->fonts[0];
 
@@ -170,7 +170,7 @@ Rectangle AlUnicodeFont::renderSelectable(const char *text, Rectangle rec, float
                 bool isGlyphSelected = false;
                 if ((selectStart >= 0) && (k >= selectStart) && (k < (selectStart + selectLength))) {
                     if (shouldRender) {
-                        DrawRectangleRec((Rectangle) {rec.x + textOffsetX - 1, rec.y + textOffsetY, glyphWidth,
+                        DrawRectangleRec(Rectangle {rec.x + textOffsetX - 1, rec.y + textOffsetY, glyphWidth,
                                                       (float) font->d.baseSize * scaleFactor}, selectBackTint);
                         isGlyphSelected = true;
                     }
@@ -178,7 +178,7 @@ Rectangle AlUnicodeFont::renderSelectable(const char *text, Rectangle rec, float
 
                 // Draw current character glyph
                 if ((codepoint != ' ') && (codepoint != '\t') && shouldRender) {
-                    DrawTextCodepoint(font->d, codepoint, (Vector2) {rec.x + textOffsetX, rec.y + textOffsetY}, fontSize,
+                    DrawTextCodepoint(font->d, codepoint, Vector2 {rec.x + textOffsetX, rec.y + textOffsetY}, fontSize,
                                       isGlyphSelected ? selectTint : tint);
                 }
             }
@@ -200,7 +200,7 @@ Rectangle AlUnicodeFont::renderSelectable(const char *text, Rectangle rec, float
         maxTextOffsetX = max(textOffsetX, maxTextOffsetX);
     }
 
-    return (Rectangle) {
+    return Rectangle {
             .x = rec.x,
             .y = rec.y,
             .width = maxTextOffsetX,

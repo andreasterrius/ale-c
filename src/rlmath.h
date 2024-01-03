@@ -10,4 +10,6 @@
 
 Transform TransformOrigin();
 
-#endif //HELLO_C_RLMATH_H
+Rectangle FullNormRectOrigin();
+
+#endif 

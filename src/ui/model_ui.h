@@ -7,12 +7,14 @@
 
 #include <string>
 #include <memory>
+#include <optional>
+#include <unordered_set>
 #include"../rldata.h"
 #include"../unicode_font.h"
 #include"../rtt.h"
 #include "button.h"
-#include <optional>
 #include "../object.h"
+#include "model_preview.h"
 
 // Contains some metadata for the UI
 struct AlModelUi_Entry {
@@ -22,21 +24,25 @@ struct AlModelUi_Entry {
 
     // Will be created after init
     std::optional<AlButton> button;
+    std::optional<AlModelPreview> modelPreview;
 };
 
 class AlModelUi {
 public:
     std::vector<AlModelUi_Entry> modelEntries;
 
+    // ID_xxx or PATH_xxx
+    std::unordered_set<std::string> loadedModelIdOrPath;
+
 private:
     /// The UI will constantly poll watchDirPath when timeToWatchElapsedMs > timeToWatchMs
     std::string watchDirPath;
-    float timeToWatchMs = 10.0f;
-    float timeToWatchElapsedMs;
+    float timeToWatchMs = 2.0f;
+    float timeToWatchElapsedMs = 0.0f;
 
     AlRtt view;
     std::shared_ptr<AlUnicodeFont> unicodeFont;
-    bool shouldRelayout;
+    bool shouldRelayout = false;
 
 public:
 
@@ -44,9 +50,9 @@ public:
 
     void tick(float dt);
 
-    void render();
+    void renderToTexture();
 
-    void renderRtt();
+    void renderTexture();
 
     std::vector<AlObject> getSpawnedObjects();
 };

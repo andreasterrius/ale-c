@@ -35,7 +35,7 @@ void AlArcCameraInput::releaseArcBall() {
 void AlArcCameraInput::zoomOut(Camera3D *camera) {
     float mouseWheelMove = GetMouseWheelMove();
     Vector3 forwardDir = Vector3Subtract(camera->target, camera->position);
-    camera->position = Vector3Add(camera->position, (Vector3) {
+    camera->position = Vector3Add(camera->position, Vector3 {
             .x = forwardDir.x * mouseWheelMove * 0.1f,
             .y = forwardDir.y * mouseWheelMove * 0.1f,
             .z = forwardDir.z * mouseWheelMove * 0.1f,

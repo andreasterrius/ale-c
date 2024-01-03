@@ -2,3 +2,6 @@ cmake-build-debug
 resources/*
 .idea
 .vscode
+.vs
+out
+build
