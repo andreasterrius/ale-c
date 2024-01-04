@@ -3,6 +3,7 @@
 //
 
 #include "scene_editor.h"
+#include "rlmath.h"
 
 AlSceneEditor::AlSceneEditor(Camera3D camera, Rectangle normalizedSceneRect) :
         sceneViewport(normalizedSceneRect),
@@ -12,6 +13,13 @@ AlSceneEditor::AlSceneEditor(Camera3D camera, Rectangle normalizedSceneRect) :
 }
 
 void AlSceneEditor::handleInput() {
+
+    // only handle when mouse is above the render target rect
+    // we check this on world position
+    Vector2 mousePos = GetMousePosition();
+    if (!IsPointInsideRect(this->sceneViewport.actualDest, mousePos)) {
+        return;
+    }
 
     {
         /// SECTION: Right click, camera rotation
@@ -57,31 +65,36 @@ void AlSceneEditor::handleInput() {
 
 bool AlSceneEditor::selectObject() {
     Ray ray = this->sceneViewport.getMouseRay(this->camera);
+    float currHitDist = std::numeric_limits<float>::max();
+    bool hitSomething = false;
     for (int i = 0; i < this->objects.size(); ++i) {
         AlObject *obj = &this->objects[i];
         obj->model->d.transform = obj->transformMat;
         for (int j = 0; j < obj->model->d.meshCount; ++j) {
             RayCollision rayCollision = GetRayCollisionMesh(ray, obj->model->d.meshes[j], obj->model->d.transform);
-            if (rayCollision.hit && !this->selectedObjectIndex.has_value()) {
-                this->selectedObjectIndex = std::make_optional(i);
-                return true;
+            if (rayCollision.hit) {
+                float dist = Vector3Distance(this->camera.position, rayCollision.point);
+                if (dist > 0.0f && dist < currHitDist) {
+                    this->selectedObjectIndex = std::make_optional(i);
+                    hitSomething = true;
+                    currHitDist = dist;
+                }
             }
         }
     }
-    return false;
+    return hitSomething;
 }
 
 void AlSceneEditor::deselectObject() {
     this->selectedObjectIndex = std::nullopt;
 }
 
-void AlSceneEditor::render() {
+void AlSceneEditor::renderToTexture() {
     // Draw Gizmo
     this->gizmoViewport.beginRenderToTexture();
     {
         BeginMode3D(this->camera);
         {
-            DrawFPS(10, 10);
             DrawText("scene editor demo!", 100, 100, 20, YELLOW);
 
             this->gizmo.render();
@@ -110,7 +123,7 @@ void AlSceneEditor::render() {
     this->sceneViewport.endRenderToTexture();
 }
 
-void AlSceneEditor::renderRtt() {
+void AlSceneEditor::renderTexture() {
     // Draw everything to screen
     this->sceneViewport.renderTexture();
     this->gizmoViewport.renderTexture();

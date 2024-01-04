@@ -12,8 +12,8 @@ public:
     Transform transform;
     bool hasTransformChanged;
 
-    std::string modelId; // for internally created meshes
     std::string modelPath; // for externally created meshes
+    bool isInternal;
     std::shared_ptr<RlModel> model;
 
     AlObject(Transform transform, std::shared_ptr<RlModel> model);

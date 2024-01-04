@@ -22,6 +22,12 @@ add_executable(editor_app editor_app.cpp
         ../../scene_file_loader.h
         ../../rljson.h
         ../../rlmath.cpp
+        ../../ui/button.h
+        ../../ui/button.cpp
+        ../../ui/model_ui.cpp
+        ../../ui/model_ui.h
+        ../../ui/model_preview.cpp
+        ../../ui/model_preview.h
         #        src/ui/button.c
 #        src/ui/button.h
 )

@@ -37,9 +37,9 @@ public:
 
     void tick(float deltaTime);
 
-    void render();
+    void renderToTexture();
 
-    void renderRtt();
+    void renderTexture();
 
     void handleInput();
 

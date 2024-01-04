@@ -52,16 +52,18 @@ int main(int argc, char **argv) {
 
     AlModelUi modelUi(unicodeFont, modelUiRect, "resources/KayKit_Prototype_Bits_1.0_FREE/Assets/gltf");
     for (auto &[k, v]: internalModels) {
-        modelUi.modelEntries.emplace_back(AlModelUi_Entry{k, "", v});
+        modelUi.modelEntries.emplace_back(AlModelUi_Entry{k, true, v});
     }
     for (auto &[k, v]: loadedModels) {
-        modelUi.modelEntries.emplace_back(AlModelUi_Entry{"", k, v});
+        modelUi.modelEntries.emplace_back(AlModelUi_Entry{k, false, v});
     }
 
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
 
         sceneEditor.handleInput();
+        modelUi.handleInput();
+
         sceneEditor.tick(deltaTime);
         modelUi.tick(deltaTime);
 
@@ -73,13 +75,16 @@ int main(int argc, char **argv) {
             sceneFileLoader.save(sceneEditor.objects);
         }
 
-        sceneEditor.render();
+        sceneEditor.renderToTexture();
         modelUi.renderToTexture();
 
         BeginDrawing();
         {
-            ClearBackground(SKYBLUE);
-            sceneEditor.renderRtt();
+            ClearBackground(BLACK);
+
+            DrawFPS(10, 10);
+
+            sceneEditor.renderTexture();
             modelUi.renderTexture();
         }
         EndDrawing();

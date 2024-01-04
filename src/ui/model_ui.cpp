@@ -4,12 +4,15 @@
 #include "model_ui.h"
 #include "../rlmath.h"
 #include <iostream>
+#include <string>
 #include <filesystem>
 
 namespace fs = std::filesystem;
 
-AlModelUi::AlModelUi(std::shared_ptr<AlUnicodeFont> unicodeFont, Rectangle normalizedDest, std::string watchDirPath) :
-        unicodeFont(std::move(unicodeFont)), view(normalizedDest), watchDirPath(watchDirPath) {
+AlModelUi::AlModelUi(std::shared_ptr<AlUnicodeFont> unicodeFont, Rectangle normRenderRect, std::string watchDirPath) :
+    unicodeFont(std::move(unicodeFont)), 
+    view(normRenderRect),
+    watchDirPath(watchDirPath) {
 }
 
 void AlModelUi::tick(float dt) {
@@ -25,7 +28,6 @@ void AlModelUi::tick(float dt) {
                     this->loadedModelIdOrPath.insert(entry.path().string());
                     Model m = LoadModel(entry.path().string().c_str());
                     this->modelEntries.push_back(AlModelUi_Entry{
-                        .modelId = entry.path().filename().string(),
                         .modelPath = entry.path().string(),
                         .model = std::make_shared<RlModel>(RlModel(m))
                     });
@@ -41,7 +43,8 @@ void AlModelUi::tick(float dt) {
     for (int i = 0; i < this->modelEntries.size(); i++) {
         AlModelUi_Entry *entry = &this->modelEntries[i];
         if (!entry->button) {
-            entry->button = AlButton(entry->modelId, this->unicodeFont, LIGHTGRAY, BLACK);
+            std::string filename = GetFileName(entry->modelPath.c_str());
+            entry->button = AlButton(filename, this->unicodeFont, LIGHTGRAY, BLACK);
             entry->button->hoverColor = PURPLE;
             entry->button->clickedColor = DARKPURPLE;
             this->shouldRelayout = true;
@@ -75,19 +78,48 @@ void AlModelUi::tick(float dt) {
             float previewWidth = previewAspect * previewHeight;
             entry->modelPreview->setRect(Rectangle{
                     .x = 0,
-                    .y = currY,
+                    .y = currY - scrollPositionY,
                     .width = previewWidth,
                     .height = previewHeight,
             });
 
             // set button size properly
             float buttonHeight = std::max(previewHeight, labelRect.height);
-            entry->button->rect = Rectangle{previewWidth, currY, this->view.actualDest.width, buttonHeight};
+            entry->button->rect = Rectangle{previewWidth, currY - scrollPositionY, this->view.actualDest.width - previewWidth, buttonHeight};
 
             // prepare next entry
             currY += buttonHeight;
         }
+        maxScrollPositionY = currY; 
         this->shouldRelayout = false;
+    }
+}
+
+void AlModelUi::handleInput() {
+
+    // only handle when mouse is above the render target rect
+    // we check this on world position
+    Vector2 mousePos = GetMousePosition();
+    if (!IsPointInsideRect(this->view.actualDest, mousePos)) {
+        return;
+    }
+
+    // handle scroll up and down
+    float mouseWheelMove = GetMouseWheelMove();
+    if (mouseWheelMove != 0.0f) {
+        this->shouldRelayout = true;
+        scrollPositionY -= mouseWheelMove * scrollSensitivity;
+
+        // validate input and clamp
+        if (scrollPositionY < minScrollPositionY) {
+            scrollPositionY = 0.0f;
+            this->shouldRelayout = false;
+        }
+        float viewHeight = this->view.actualDest.height;
+        if (scrollPositionY + viewHeight > maxScrollPositionY) {
+            scrollPositionY = maxScrollPositionY - viewHeight;
+            this->shouldRelayout = false;
+        }
     }
 }
 
@@ -104,7 +136,7 @@ void AlModelUi::renderToTexture() {
     // Draw Buttons
     this->view.beginRenderToTexture();
     {
-        DrawRectangle(0, 0, this->view.actualDest.width, this->view.actualDest.height, BLACK);
+        DrawRectangle(0, 0, this->view.actualDest.width, this->view.actualDest.height, GREEN);
 
         for (int i = 0; i < this->modelEntries.size(); ++i) {
             AlModelUi_Entry *entry = &this->modelEntries[i];
@@ -129,8 +161,8 @@ std::vector<AlObject> AlModelUi::getSpawnedObjects() {
         AlModelUi_Entry *entry = &this->modelEntries[i];
         if (entry->button && entry->button->getHasJustBeenPressed()) {
             objects.emplace_back(TransformOrigin(), entry->model);
-            objects.back().modelId = entry->modelId;
             objects.back().modelPath = entry->modelPath;
+            objects.back().isInternal = entry->isInternal;
         }
     }
     return objects;

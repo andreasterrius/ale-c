@@ -24,10 +24,10 @@ void AlModelPreview::renderToTexture() {
    
     this->displayTexture.beginRenderToTexture();
 
-    ClearBackground(ColorAlpha(SKYBLUE, 1.0f));
+    ClearBackground(ColorAlpha(DARKBLUE, 1.0f));
     BeginMode3D(camera);
     DrawModel(this->model->d, Vector3Zero(), 1.0f, WHITE);
-    DrawGrid(10, 1.0f);
+    //DrawGrid(10, 1.0f);
     EndMode3D();
 
 	this->displayTexture.endRenderToTexture();

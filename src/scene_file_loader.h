@@ -12,11 +12,11 @@
 #include<optional>
 
 struct AlSceneFileLoader_ObjectFile {
-    std::string modelId; // for internal
     std::string modelPath; // for external
+    bool isInternal;
     Transform transform;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AlSceneFileLoader_ObjectFile, modelId, modelPath, transform)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AlSceneFileLoader_ObjectFile, modelPath, isInternal, transform)
 };
 
 struct AlSceneFileLoader_SceneFile {

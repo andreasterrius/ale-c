@@ -22,9 +22,9 @@ public:
 private:
     std::string label;
     std::shared_ptr<AlUnicodeFont> font;
-    bool isHeldDown;
-    bool isHovered;
-    bool hasJustBeenPressed;
+    bool isHeldDown = false;
+    bool isHovered = false;
+    bool hasJustBeenPressed = false;
     Color currentColor;
 
 public:

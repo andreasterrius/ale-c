@@ -10,8 +10,8 @@ bool AlSceneFileLoader::save(std::vector<AlObject> &objects) {
     AlSceneFileLoader_SceneFile sceneFile;
     for (int i = 0; i < objects.size(); ++i) {
         sceneFile.objects.emplace_back(AlSceneFileLoader_ObjectFile{
-                .modelId = objects[i].modelId,
                 .modelPath = objects[i].modelPath,
+                .isInternal = objects[i].isInternal,
                 .transform = objects[i].transform
         });
     }
@@ -50,19 +50,37 @@ AlSceneFileLoader::load(std::unordered_map<std::string, std::shared_ptr<RlModel>
     for (int i = 0; i < sceneFile.objects.size(); ++i) {
         AlSceneFileLoader_ObjectFile *fileObj = &sceneFile.objects[i];
         // load model first
-        if (fileObj->modelId != "" && internalModels.find(fileObj->modelId) != internalModels.end()) {
-            auto model = internalModels[fileObj->modelId];
-            loadedScene.objects.emplace_back(fileObj->transform, model);
-            loadedScene.objects.back().modelId = fileObj->modelId;
-        } else if (fileObj->modelPath != "" && loadedModels.find(fileObj->modelPath) != loadedModels.end()) {
-            auto model = loadedModels[fileObj->modelPath];
-            loadedScene.objects.emplace_back(fileObj->transform, model);
-            loadedScene.objects.back().modelPath = fileObj->modelPath;
-        } else {
-            std::cout << "An object was skipped in loading because invalid modelId: "
-                      << fileObj->modelId << "or modelPath:"
-                      << fileObj->modelPath << std::endl;
+        // if it's an internal model, no need to laod anything, just reference it directly
+        if (fileObj->isInternal) {
+            if (internalModels.find(fileObj->modelPath) != internalModels.end()) {
+                auto model = internalModels[fileObj->modelPath];
+                loadedScene.objects.emplace_back(fileObj->transform, model);
+                loadedScene.objects.back().modelPath = fileObj->modelPath;
+                loadedScene.objects.back().isInternal = true;
+            }
+            else {
+                TraceLog(LOG_WARNING, ("An internal model was skipped in loading because invalid modelPath: " + fileObj->modelPath).c_str());
+            }
         }
+       
+        // this is an external model for sure
+        if (!fileObj->isInternal) {
+            if (loadedModels.find(fileObj->modelPath) == loadedModels.end()) {
+                auto model = std::make_shared<RlModel>(LoadModel(fileObj->modelPath.c_str()));
+                loadedScene.objects.emplace_back(fileObj->transform, model);
+                loadedScene.objects.back().modelPath = fileObj->modelPath;
+                loadedScene.objects.back().isInternal = false;
+
+                loadedModels[fileObj->modelPath] = model;
+            }
+            else {
+                TraceLog(LOG_WARNING, ("Has been loaded before, skip loading modelPath: " + fileObj->modelPath).c_str());
+                auto model = loadedModels[fileObj->modelPath];
+                loadedScene.objects.emplace_back(fileObj->transform, model);
+                loadedScene.objects.back().modelPath = fileObj->modelPath;
+                loadedScene.objects.back().isInternal = false;
+            }
+        } 
     }
     return std::make_optional(std::move(loadedScene));
 }

@@ -12,4 +12,6 @@ Transform TransformOrigin();
 
 Rectangle FullNormRectOrigin();
 
+bool IsPointInsideRect(Rectangle r, Vector2 point);
+
 #endif 

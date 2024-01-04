@@ -20,3 +20,12 @@ Rectangle FullNormRectOrigin()
         .height = 1.0,
     };
 }
+
+bool IsPointInsideRect(Rectangle r, Vector2 point)
+{
+    if (r.x < point.x && point.x < r.x + r.width &&
+        r.y < point.y && point.y < r.y + r.height) {
+        return true;
+    }
+    return false;
+}
