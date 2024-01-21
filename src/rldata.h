@@ -94,9 +94,22 @@ struct ShaderDestroy {
     }
 };
 
+struct TextureDestroy {
+    static Texture reset() {
+        return Texture{ 0 };
+    }
+
+    static void destroy(Texture& texture) {
+        if (IsTextureReady(texture)) {
+            TextureDestroy(texture);
+        }
+    }
+};
+
 using RlFont = ResourceHandle<Font, FontDestroy>;
 using RlModel = ResourceHandle<Model, ModelDestroy>;
 using RlRenderTexture2D = ResourceHandle<RenderTexture2D, RenderTexture2DDestroy>;
 using RlShader = ResourceHandle<Shader, ShaderDestroy>;
+using RlTexture = ResourceHandle<Texture, TextureDestroy>;
 
 #endif //HELLO_C_RLDATA_H

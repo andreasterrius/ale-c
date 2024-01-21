@@ -5,6 +5,7 @@
 #include<raymath.h>
 #include<memory>
 #include"rldata.h"
+#include"pbr_shader.h"
 
 class AlObject {
 public:
@@ -15,14 +16,17 @@ public:
     std::string modelPath; // for externally created meshes
     bool isInternal;
     std::shared_ptr<RlModel> model;
+    AlPbrMaterial pbrMaterial;
 
-    AlObject(Transform transform, std::shared_ptr<RlModel> model);
+    AlObject(Transform transform, std::shared_ptr<RlModel> model, std::shared_ptr<AlPbrShader> pbrShader);
 
     void recalculate();
 
     // If the transform is changed, we should recalculate transform (Transform) -> model.transform (matrix)
     // should be called before rendering/after update
     void tryRecalculate();
+
+    void draw();
 };
 
 

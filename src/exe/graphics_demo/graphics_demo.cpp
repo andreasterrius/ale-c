@@ -26,7 +26,6 @@ int main(int argc, char **argv) {
     int lightColorLoc = GetShaderLocation(shader.d, "lightColor");
 
     Vector3 lightPos = Vector3Zero();
-    SetShaderValue(shader.d, )
 
     Color lightColor = WHITE;
 

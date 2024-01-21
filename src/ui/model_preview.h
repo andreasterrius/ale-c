@@ -2,13 +2,13 @@
 
 #include"../rtt.h"
 #include"../rldata.h"
-#include"../rldata.h"
+#include"../object.h"
 
 class AlModelPreview {
 private:
 
 	AlRtt displayTexture;
-	std::shared_ptr<RlModel> model;
+    AlObject object;
 
 	// For now let's use the same camera always
 	Camera camera;
@@ -17,7 +17,7 @@ private:
 	// can proceed to render the rtt directly.
 	bool displayTextureRenderedOnce = false;
 public:
-	explicit AlModelPreview(std::shared_ptr<RlModel> model);
+	AlModelPreview(std::shared_ptr<RlModel> model, std::shared_ptr<AlPbrShader> shader);
 
 	void renderToTexture();
 

@@ -13,7 +13,6 @@
 #include"../unicode_font.h"
 #include"../rtt.h"
 #include "button.h"
-#include "../object.h"
 #include "model_preview.h"
 
 // Contains some metadata for the UI
@@ -52,8 +51,11 @@ private:
     std::shared_ptr<AlUnicodeFont> unicodeFont;
     bool shouldRelayout = false;
 
+    std::shared_ptr<AlPbrShader> pbrShader;
+
 public:
-    AlModelUi(std::shared_ptr<AlUnicodeFont> font, Rectangle normalizedDest, std::string watchDirPath);
+    AlModelUi(std::shared_ptr<AlUnicodeFont> font, Rectangle normalizedDest, std::string watchDirPath,
+              std::shared_ptr<AlPbrShader> pbrShader);
 
     void tick(float dt);
 

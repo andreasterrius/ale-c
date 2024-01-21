@@ -29,3 +29,12 @@ bool IsPointInsideRect(Rectangle r, Vector2 point)
     }
     return false;
 }
+
+Vector3 ColorNormalize3(Color c) {
+    Vector4 a = ColorNormalize(c);
+    return Vector3{
+        .x = a.x,
+        .y = a.y,
+        .z = a.z,
+    };
+}

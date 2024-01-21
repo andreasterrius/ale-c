@@ -2,11 +2,9 @@
 #include<raymath.h>
 #include<string>
 #include"../../arc_camera.h"
-
-class Light {
-public:
-
-};
+#include"../../pbr_shader.h"
+#include"../../rlmath.h"
+#include"../../object.h"
 
 int main(int argc, char** argv) {
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -25,52 +23,27 @@ int main(int argc, char** argv) {
 
 	AlArcCameraInput alArcCameraInput;
 
-	Model model = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
 	Model sphereModel = LoadModelFromMesh(GenMeshSphere(1.0f, 16, 16));
-	//Model testModel = LoadModel("resources/starter_assets/OBJ/SM_Bean_Cop_01.obj");
-	Model testModel = LoadModel("resources/KayKit_Adventurers_1.0_FREE/Characters/gltf/Barbarian.glb");
-
-	Shader pbrShader = LoadShader("resources/shaders/pbr.vert", "resources/shaders/pbr.frag");
-	testModel.materials[0].shader = pbrShader;
-	testModel.materials[1].shader = pbrShader;
-
-
-	float color[3] = { 0.5, 0.0, 0.0 };
-	float value = 0.5f;
-	float metallic = 0.2f;
-	SetShaderValue(pbrShader, GetShaderLocation(pbrShader, "albedo"), color, SHADER_UNIFORM_VEC3);
-	SetShaderValue(pbrShader, GetShaderLocation(pbrShader, "metallic"), &metallic, SHADER_UNIFORM_FLOAT);
-	SetShaderValue(pbrShader, GetShaderLocation(pbrShader, "roughness"), &value, SHADER_UNIFORM_FLOAT);
-	SetShaderValue(pbrShader, GetShaderLocation(pbrShader, "ao"), &value, SHADER_UNIFORM_FLOAT);
+	std::shared_ptr<RlModel> testModel = std::make_shared<RlModel>(LoadModel("resources/KayKit_Adventurers_1.0_FREE/Characters/gltf/Barbarian.glb"));
+	std::shared_ptr<RlTexture> testTexture = std::make_shared<RlTexture>(LoadTexture("resources/KayKit_Adventurers_1.0_FREE/Textures/barbarian_texture.png"));
+	std::shared_ptr<AlPbrShader> pbrShader = std::make_shared<AlPbrShader>(LoadShader("resources/shaders/pbr.vert", "resources/shaders/pbr.frag"));
 	
+	AlObject object = AlObject(TransformOrigin(), testModel, pbrShader);
+	object.pbrMaterial.albedo = ColorNormalize3(Color{0, 0, 0});
+	object.pbrMaterial.metallic = 0.0f;
+	object.pbrMaterial.roughness = 0.5f;
+	object.pbrMaterial.AO = 1.0f;
+	object.pbrMaterial.albedoMap = testTexture;
+	object.pbrMaterial.needPassToMat = true;
 
-	Vector3 lightPositions[] = {
-		Vector3(-10.0f,  10.0f, 10.0f),
-		Vector3(10.0f,  10.0f, 10.0f),
-		Vector3(-10.0f, -10.0f, 10.0f),
-		Vector3(10.0f, -10.0f, 10.0f),
+	float lightPower = 500.0f;
+	std::vector<AlLight> lights{
+		AlLight{ .position = Vector3{-10.0f,  10.0f, 10.0f}, .colors = Vector3{lightPower, lightPower, lightPower} },
+		AlLight{ .position = Vector3{10.0f,  10.0f, 10.0f}, .colors = Vector3{lightPower, lightPower, lightPower} },
+		AlLight{ .position = Vector3{-10.0f,  -10.0f, 10.0f}, .colors = Vector3{lightPower, lightPower, lightPower} },
+		AlLight{ .position = Vector3{-10.0f,  -10.0f, 10.0f}, .colors = Vector3{lightPower, lightPower, lightPower} },
 	};
-	Vector3 lightColors[] = {
-		Vector3(300.0f, 300.0f, 300.0f),
-		Vector3(300.0f, 300.0f, 300.0f),
-		Vector3(300.0f, 300.0f, 300.0f),
-		Vector3(300.0f, 300.0f, 300.0f)
-	};
-	int lightPositionLoc[] = {
-		GetShaderLocation(pbrShader, "lightPositions[0]"),
-		GetShaderLocation(pbrShader, "lightPositions[1]"),
-		GetShaderLocation(pbrShader, "lightPositions[2]"),
-		GetShaderLocation(pbrShader, "lightPositions[3]"),
-	};
-	int lightColorLoc[] = {
-		GetShaderLocation(pbrShader, "lightColors[0]"),
-		GetShaderLocation(pbrShader, "lightColors[1]"),
-		GetShaderLocation(pbrShader, "lightColors[2]"),
-		GetShaderLocation(pbrShader, "lightColors[3]"),
-	};
-	int camPosLoc = GetShaderLocation(pbrShader, "camPos");
-	
-	Ray ray = GetMouseRay(GetMousePosition(), camera);
+
 	float time = 0.0f;
 	while (!WindowShouldClose()) {
 		time += GetFrameTime();
@@ -94,34 +67,19 @@ int main(int argc, char** argv) {
 			ClearBackground(ColorAlpha(SKYBLUE, 1.0f));
 			BeginMode3D(camera);
 
-			SetShaderValue(pbrShader, camPosLoc, &camera.position, SHADER_UNIFORM_VEC3);
-			
-			for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
-			{
-				Vector3 newPos = Vector3Add(lightPositions[i], Vector3(sin(time * 5.0) * 5.0, 0.0, 0.0));
-			
-				SetShaderValue(pbrShader, lightPositionLoc[i], &newPos, SHADER_UNIFORM_VEC3);
-				SetShaderValue(pbrShader, lightColorLoc[i], &lightColors[i], SHADER_UNIFORM_VEC3);
+			pbrShader->passScene(camera, &lights);
 
-				//model = glm::mat4(1.0f);
-				//model = glm::translate(model, newPos);
-				//model = glm::scale(model, glm::vec3(0.5f));
-				//shader.setMat4("model", model);
-				//shader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-				DrawModel(sphereModel, newPos, 1.0f, WHITE);
-			}
-
-
-			DrawRay(ray, RED);
-			DrawModel(testModel, Vector3Zero(), 1.0f, WHITE);
+            for(int i = 0; i < lights.size(); ++i) {
+                DrawModel(sphereModel, lights[i].position, 1.0, WHITE);
+            }
+			object.draw();
 
 			DrawGrid(10, 1.0f);
 			EndMode3D();
 			EndDrawing();
 		}
 	}
-
-	UnloadModel(model);
+;
 	UnloadModel(sphereModel);
 	CloseWindow();
 

@@ -9,10 +9,14 @@
 
 namespace fs = std::filesystem;
 
-AlModelUi::AlModelUi(std::shared_ptr<AlUnicodeFont> unicodeFont, Rectangle normRenderRect, std::string watchDirPath) :
+AlModelUi::AlModelUi(std::shared_ptr<AlUnicodeFont> unicodeFont,
+                     Rectangle normRenderRect,
+                     std::string watchDirPath,
+                     std::shared_ptr<AlPbrShader> pbrShader) :
     unicodeFont(std::move(unicodeFont)), 
     view(normRenderRect),
-    watchDirPath(watchDirPath) {
+    watchDirPath(watchDirPath),
+    pbrShader(std::move(pbrShader)){
 }
 
 void AlModelUi::tick(float dt) {
@@ -29,6 +33,7 @@ void AlModelUi::tick(float dt) {
                     Model m = LoadModel(entry.path().string().c_str());
                     this->modelEntries.push_back(AlModelUi_Entry{
                         .modelPath = entry.path().string(),
+                        .isInternal = false,
                         .model = std::make_shared<RlModel>(RlModel(m))
                     });
                 }
@@ -54,7 +59,7 @@ void AlModelUi::tick(float dt) {
         }
 
         if (!entry->modelPreview && entry->button) {
-            entry->modelPreview = AlModelPreview(entry->model);
+            entry->modelPreview = AlModelPreview(entry->model, this->pbrShader);
             this->shouldRelayout = true;
         }
     }
@@ -160,7 +165,7 @@ std::vector<AlObject> AlModelUi::getSpawnedObjects() {
     for (int i = 0; i < this->modelEntries.size(); ++i) {
         AlModelUi_Entry *entry = &this->modelEntries[i];
         if (entry->button && entry->button->getHasJustBeenPressed()) {
-            objects.emplace_back(TransformOrigin(), entry->model);
+            objects.emplace_back(TransformOrigin(), entry->model, this->pbrShader);
             objects.back().modelPath = entry->modelPath;
             objects.back().isInternal = entry->isInternal;
         }

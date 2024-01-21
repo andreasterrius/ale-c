@@ -14,4 +14,6 @@ Rectangle FullNormRectOrigin();
 
 bool IsPointInsideRect(Rectangle r, Vector2 point);
 
+Vector3 ColorNormalize3(Color);
+
 #endif 

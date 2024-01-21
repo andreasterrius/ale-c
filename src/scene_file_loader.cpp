@@ -31,7 +31,8 @@ bool AlSceneFileLoader::save(std::vector<AlObject> &objects) {
 
 std::optional<AlSceneFileLoader_LoadedScene>
 AlSceneFileLoader::load(std::unordered_map<std::string, std::shared_ptr<RlModel>> &internalModels,
-                        std::unordered_map<std::string, std::shared_ptr<RlModel>> &loadedModels) {
+                        std::unordered_map<std::string, std::shared_ptr<RlModel>> &loadedModels,
+                        std::shared_ptr<AlPbrShader> pbrShader) {
 
     std::cout << "Loading from " << this->path << "..." << std::endl;
 
@@ -54,7 +55,7 @@ AlSceneFileLoader::load(std::unordered_map<std::string, std::shared_ptr<RlModel>
         if (fileObj->isInternal) {
             if (internalModels.find(fileObj->modelPath) != internalModels.end()) {
                 auto model = internalModels[fileObj->modelPath];
-                loadedScene.objects.emplace_back(fileObj->transform, model);
+                loadedScene.objects.emplace_back(fileObj->transform, model, pbrShader);
                 loadedScene.objects.back().modelPath = fileObj->modelPath;
                 loadedScene.objects.back().isInternal = true;
             }
@@ -67,7 +68,7 @@ AlSceneFileLoader::load(std::unordered_map<std::string, std::shared_ptr<RlModel>
         if (!fileObj->isInternal) {
             if (loadedModels.find(fileObj->modelPath) == loadedModels.end()) {
                 auto model = std::make_shared<RlModel>(LoadModel(fileObj->modelPath.c_str()));
-                loadedScene.objects.emplace_back(fileObj->transform, model);
+                loadedScene.objects.emplace_back(fileObj->transform, model, pbrShader);
                 loadedScene.objects.back().modelPath = fileObj->modelPath;
                 loadedScene.objects.back().isInternal = false;
 
@@ -76,7 +77,7 @@ AlSceneFileLoader::load(std::unordered_map<std::string, std::shared_ptr<RlModel>
             else {
                 TraceLog(LOG_WARNING, ("Has been loaded before, skip loading modelPath: " + fileObj->modelPath).c_str());
                 auto model = loadedModels[fileObj->modelPath];
-                loadedScene.objects.emplace_back(fileObj->transform, model);
+                loadedScene.objects.emplace_back(fileObj->transform, model, pbrShader);
                 loadedScene.objects.back().modelPath = fileObj->modelPath;
                 loadedScene.objects.back().isInternal = false;
             }

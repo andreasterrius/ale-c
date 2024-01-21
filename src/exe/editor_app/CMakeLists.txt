@@ -20,6 +20,8 @@ add_executable(editor_app editor_app.cpp
         ../../rlmath.h
         ../../scene_file_loader.cpp
         ../../scene_file_loader.h
+        ../../pbr_shader.cpp
+        ../../pbr_shader.h
         ../../rljson.h
         ../../rlmath.cpp
         ../../ui/button.h

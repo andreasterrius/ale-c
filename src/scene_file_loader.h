@@ -39,7 +39,8 @@ public:
 
     std::optional<AlSceneFileLoader_LoadedScene> load(
         std::unordered_map<std::string, std::shared_ptr<RlModel>> &internalModels,
-        std::unordered_map<std::string, std::shared_ptr<RlModel>> &loadedModels //mutate this parameter
+        std::unordered_map<std::string, std::shared_ptr<RlModel>> &loadedModels, //mutate this parameter
+        std::shared_ptr<AlPbrShader> pbrShader
     );
 };
 

@@ -1,8 +1,10 @@
 #include"model_preview.h"
 #include"../rlmath.h"
 
-AlModelPreview::AlModelPreview(std::shared_ptr<RlModel> model) : model(model), 
-    displayTexture(FullNormRectOrigin()) {
+AlModelPreview::AlModelPreview(std::shared_ptr<RlModel> model, std::shared_ptr<AlPbrShader> shader) :
+    object(TransformOrigin(), model, shader),
+    displayTexture(FullNormRectOrigin()
+) {
     BoundingBox bb = GetModelBoundingBox(model->d);
     Vector3 mid = Vector3{
         .x = (bb.min.x + bb.max.x) / 2.0f,
@@ -21,12 +23,13 @@ AlModelPreview::AlModelPreview(std::shared_ptr<RlModel> model) : model(model),
 
 void AlModelPreview::renderToTexture() {
     if (this->displayTextureRenderedOnce) return;
-   
+
     this->displayTexture.beginRenderToTexture();
 
     ClearBackground(ColorAlpha(DARKBLUE, 1.0f));
     BeginMode3D(camera);
-    DrawModel(this->model->d, Vector3Zero(), 1.0f, WHITE);
+    this->object.draw();
+//    DrawModel(this->model->d, Vector3Zero(), 1.0f, WHITE);
     //DrawGrid(10, 1.0f);
     EndMode3D();
 
