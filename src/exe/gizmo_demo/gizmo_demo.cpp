@@ -19,7 +19,6 @@ int main(int argc, char **argv) {
 
     AlObject object(TransformOrigin(),
                     std::make_shared<RlModel>(LoadModelFromMesh(GenMeshCube(2.0f, 1.0f, 1.0f))));
-
     AlGizmo gizmo;
 
     while (!WindowShouldClose()) {

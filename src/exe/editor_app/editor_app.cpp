@@ -2,10 +2,11 @@
 #include<raymath.h>
 #include"../../object.h"
 #include"../../scene_editor.h"
-#include "../../ui/model_ui.h"
-#include "../../light.h"
-#include "../../pbr_shader.h"
+#include"../../ui/model_ui.h"
+#include"../../light.h"
+#include"../../pbr_shader.h"
 #include"../../scene_file_loader.h"
+#include"../../default_stuff.h"
 #include<vector>
 
 int main(int argc, char **argv) {
@@ -28,18 +29,11 @@ int main(int argc, char **argv) {
     Rectangle sceneRect = Rectangle{.x = 0.0f, .y = 0.0f, .width = 0.8f, .height=0.8f * sceneAspectRatio,};
     Rectangle modelUiRect = Rectangle{.x = sceneRect.width, .y = 0.0f, .width = 0.2f, .height=1.0f * sceneAspectRatio,};
 
-    std::shared_ptr<AlUnicodeFont> unicodeFont = std::make_shared<AlUnicodeFont>(
-            "resources/font/NotoSansCJKjp-VF.ttf",
-            24,
-            std::vector{AlUnicodeFontRange{.start = 0, .end=255}}
-    );
+    DefaultStuff defaultStuff;
 
     // Let's do save and load here
     AlSceneFileLoader sceneFileLoader("resources/scenes/hello-scene-01.json");
     AlSceneEditor sceneEditor(camera, sceneRect);
-
-    std::shared_ptr<AlPbrShader> pbrShader = std::make_shared<AlPbrShader>(
-            LoadShader("resources/shaders/pbr.vert", "resources/shaders/pbr.frag"));
 
     // Load available models
     std::unordered_map<std::string, std::shared_ptr<RlModel>> internalModels{
@@ -48,21 +42,18 @@ int main(int argc, char **argv) {
     };
     std::unordered_map<std::string, std::shared_ptr<RlModel>> loadedModels{};
 
-    std::optional<AlSceneFileLoader_LoadedScene> loadedScene = sceneFileLoader.load(internalModels, loadedModels, pbrShader);
+    std::optional<AlSceneFileLoader_LoadedScene> loadedScene = sceneFileLoader.load(internalModels, loadedModels, defaultStuff.pbrShader);
     if (loadedScene.has_value()) {
         sceneEditor.objects.insert(sceneEditor.objects.end(), loadedScene->objects.begin(), loadedScene->objects.end());
     }
 
-    AlModelUi modelUi(unicodeFont, modelUiRect, "resources/KayKit_Prototype_Bits_1.0_FREE/Assets/gltf", pbrShader);
+    AlModelUi modelUi(defaultStuff.unicodeFont, modelUiRect, "resources/KayKit_Prototype_Bits_1.0_FREE/Assets/gltf", defaultStuff.pbrShader);
     for (auto &[k, v]: internalModels) {
         modelUi.modelEntries.emplace_back(AlModelUi_Entry{k, true, v});
     }
     for (auto &[k, v]: loadedModels) {
         modelUi.modelEntries.emplace_back(AlModelUi_Entry{k, false, v});
     }
-
-    // For the lights
-    Model sphereModel = LoadModelFromMesh(GenMeshSphere(1.0f, 16, 16));
 
     float lightPower = 500.0f;
     std::vector<AlLight> lights{
@@ -71,13 +62,6 @@ int main(int argc, char **argv) {
             AlLight{.position = Vector3{-10.0f, -10.0f, -10.0f}, .colors = Vector3{lightPower, lightPower, lightPower}},
             AlLight{.position = Vector3{10.0f, -10.0f, -10.0f}, .colors = Vector3{lightPower, lightPower, lightPower}},
     };
-
-//    for (int i = 0; i < modelUi.modelEntries.size(); ++i) {
-//        int matLen = modelUi.modelEntries[i].model->d.materialCount;
-//        for (int j = 0; j < matLen; ++j) {
-//            modelUi.modelEntries[i].model->d.materials[j].shader = pbrShader;
-//        }
-//    }
 
     float time = 0;
     while (!WindowShouldClose()) {
@@ -98,7 +82,7 @@ int main(int argc, char **argv) {
         }
 
         time += deltaTime;
-        pbrShader->passScene(camera, &lights);
+        defaultStuff.pbrShader->passScene(camera, &lights);
 
         sceneEditor.renderToTexture();
         modelUi.renderToTexture();

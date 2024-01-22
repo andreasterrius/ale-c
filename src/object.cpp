@@ -15,6 +15,7 @@ void AlObject::recalculate() {
 
     Matrix matTransform = MatrixMultiply(MatrixMultiply(matScale, matRotation), matTranslation);
     this->transformMat = matTransform;
+    this->model->d.transform = this->transformMat;
 }
 
 void AlObject::tryRecalculate() {
@@ -22,6 +23,18 @@ void AlObject::tryRecalculate() {
         this->recalculate();
         this->hasTransformChanged = false;
     }
+}
+
+AlObject::AlObject(
+        Transform transform,
+        std::shared_ptr<RlModel> model) :
+        transform(transform),
+        model(std::move(model)),
+        hasTransformChanged(false),
+        transformMat(MatrixIdentity()),
+        pbrMaterial(std::nullopt)
+{
+    recalculate();
 }
 
 AlObject::AlObject(
@@ -36,20 +49,23 @@ AlObject::AlObject(
 {
     recalculate();
     for (int i = 0; i < this->model->d.materialCount; ++i) {
-        this->model->d.materials[i].shader = this->pbrMaterial.pbrShader->rlShader.d;
+        this->model->d.materials[i].shader = this->pbrMaterial->pbrShader->rlShader.d;
     }
 }
 
 void AlObject::draw() {
-    this->pbrMaterial.passVariables();
 
-    if (this->pbrMaterial.needPassToMat) {
-        for (int i = 0; i < this->model->d.materialCount; ++i) {
-            if (this->pbrMaterial.albedoMap.has_value()) {
-                this->model->d.materials[i].maps[MATERIAL_MAP_ALBEDO].texture = this->pbrMaterial.albedoMap->get()->d;
+    if(this->pbrMaterial.has_value()){
+        this->pbrMaterial->passVariables();
+
+        if (this->pbrMaterial->needPassToMat) {
+            for (int i = 0; i < this->model->d.materialCount; ++i) {
+                if (this->pbrMaterial->albedoMap.has_value()) {
+                    this->model->d.materials[i].maps[MATERIAL_MAP_ALBEDO].texture = this->pbrMaterial->albedoMap->get()->d;
+                }
             }
+            this->pbrMaterial->needPassToMat = false;
         }
-        this->pbrMaterial.needPassToMat = false;
     }
 
     DrawModel(this->model->d, Vector3Zero(), 1.0f, WHITE);

@@ -30,6 +30,8 @@ add_executable(editor_app editor_app.cpp
         ../../ui/model_ui.h
         ../../ui/model_preview.cpp
         ../../ui/model_preview.h
+        ../../default_stuff.cpp
+        ../../default_stuff.h
         #        src/ui/button.c
 #        src/ui/button.h
 )

@@ -4,6 +4,7 @@
 #include<raylib.h>
 #include<raymath.h>
 #include<memory>
+#include<optional>
 #include"rldata.h"
 #include"pbr_shader.h"
 
@@ -16,7 +17,9 @@ public:
     std::string modelPath; // for externally created meshes
     bool isInternal;
     std::shared_ptr<RlModel> model;
-    AlPbrMaterial pbrMaterial;
+    std::optional<AlPbrMaterial> pbrMaterial;
+
+    AlObject(Transform transform, std::shared_ptr<RlModel> model);
 
     AlObject(Transform transform, std::shared_ptr<RlModel> model, std::shared_ptr<AlPbrShader> pbrShader);
 

@@ -31,6 +31,7 @@ void AlModelUi::tick(float dt) {
                 if (entry.path().extension()  == ".glb" || entry.path().extension() == ".gltf") {
                     this->loadedModelIdOrPath.insert(entry.path().string());
                     Model m = LoadModel(entry.path().string().c_str());
+
                     this->modelEntries.push_back(AlModelUi_Entry{
                         .modelPath = entry.path().string(),
                         .isInternal = false,
