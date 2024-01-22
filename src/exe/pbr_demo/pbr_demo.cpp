@@ -29,12 +29,12 @@ int main(int argc, char** argv) {
 	std::shared_ptr<AlPbrShader> pbrShader = std::make_shared<AlPbrShader>(LoadShader("resources/shaders/pbr.vert", "resources/shaders/pbr.frag"));
 	
 	AlObject object = AlObject(TransformOrigin(), testModel, pbrShader);
-	object.pbrMaterial.albedo = ColorNormalize3(Color{0, 0, 0});
-	object.pbrMaterial.metallic = 0.0f;
-	object.pbrMaterial.roughness = 0.5f;
-	object.pbrMaterial.AO = 1.0f;
-	object.pbrMaterial.albedoMap = testTexture;
-	object.pbrMaterial.needPassToMat = true;
+	object.pbrMaterial->albedo = ColorNormalize3(Color{0, 0, 0});
+	object.pbrMaterial->metallic = 0.0f;
+	object.pbrMaterial->roughness = 0.5f;
+	object.pbrMaterial->AO = 1.0f;
+	object.pbrMaterial->albedoMap = testTexture;
+	object.pbrMaterial->needPassToMat = true;
 
 	float lightPower = 500.0f;
 	std::vector<AlLight> lights{
